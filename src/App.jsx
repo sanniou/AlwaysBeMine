@@ -25,11 +25,14 @@ export default function Page() {
   const [isMuted, setIsMuted] = useState(false);
   const [popupShown, setPopupShown] = useState(false);
   const [yespopupShown, setYesPopupShown] = useState(false);
+  const [earlyYesSkipped, setEarlyYesSkipped] = useState(false);
 
   const gifRef = useRef(null);
   const yesButtonSize = noCount * ui.yesButtonGrowPerNo + ui.yesButtonBaseSize;
 
   const [floatingGifs, setFloatingGifs] = useState([]);
+
+  const isSuccessUnlocked = noCount >= thresholds.successAfterNoCount || earlyYesSkipped;
 
   const generateRandomPositionWithSpacing = (existingPositions) => {
     let position;
@@ -84,28 +87,6 @@ export default function Page() {
     setFloatingGifs([]);
   };
 
-  useEffect(() => {
-    if (gifRef.current && yesPressed && noCount >= thresholds.successAfterNoCount) {
-      gifRef.current.src = media.yesGifs[currentGifIndex];
-    }
-  }, [yesPressed, currentGifIndex, noCount]);
-
-  useEffect(() => {
-    if (yesPressed && noCount >= thresholds.successAfterNoCount) {
-      const intervalId = setInterval(() => {
-        setCurrentGifIndex((prevIndex) => (prevIndex + 1) % media.yesGifs.length);
-      }, media.successGifSwitchIntervalMs);
-
-      return () => clearInterval(intervalId);
-    }
-  }, [yesPressed, noCount]);
-
-  useEffect(() => {
-    if (gifRef.current) {
-      gifRef.current.src = gifRef.current.src;
-    }
-  }, [noCount]);
-
   const playMusic = (url, musicArray) => {
     if (currentAudio) {
       currentAudio.pause();
@@ -126,6 +107,40 @@ export default function Page() {
 
     audioInstance.play();
   };
+
+  useEffect(() => {
+    if (gifRef.current && yesPressed && isSuccessUnlocked) {
+      gifRef.current.src = media.yesGifs[currentGifIndex];
+    }
+  }, [yesPressed, currentGifIndex, isSuccessUnlocked]);
+
+  useEffect(() => {
+    if (yesPressed && isSuccessUnlocked) {
+      const intervalId = setInterval(() => {
+        setCurrentGifIndex((prevIndex) => (prevIndex + 1) % media.yesGifs.length);
+      }, media.successGifSwitchIntervalMs);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [yesPressed, isSuccessUnlocked]);
+
+  useEffect(() => {
+    if (gifRef.current) {
+      gifRef.current.src = gifRef.current.src;
+    }
+  }, [noCount]);
+
+  useEffect(() => {
+    if (isSuccessUnlocked) {
+      return undefined;
+    }
+
+    const timer = setTimeout(() => {
+      setEarlyYesSkipped(true);
+    }, thresholds.earlyYesAutoSkipDelayMs);
+
+    return () => clearTimeout(timer);
+  }, [isSuccessUnlocked]);
 
   const handleNoClick = () => {
     const nextCount = noCount + 1;
@@ -148,13 +163,16 @@ export default function Page() {
   };
 
   const handleYesClick = () => {
-    if (!popupShown) {
+    if (!popupShown && !isSuccessUnlocked) {
       setYesPressed(true);
+      return;
     }
 
-    if (noCount >= thresholds.successAfterNoCount) {
+    if (isSuccessUnlocked) {
       setYesPressed(true);
-      playMusic(audio.yesTracks[audio.startYesTrackIndex], audio.yesTracks);
+      if (audio.autoplayAfterEarlyYesSkip) {
+        playMusic(audio.yesTracks[audio.startYesTrackIndex], audio.yesTracks);
+      }
     }
   };
 
@@ -170,7 +188,7 @@ export default function Page() {
   };
 
   useEffect(() => {
-    if (yesPressed && noCount < thresholds.successAfterNoCount && !popupShown) {
+    if (yesPressed && !isSuccessUnlocked && !popupShown) {
       Swal.fire({
         title: dialogues.earlyYesPopup.title,
         showClass: {
@@ -190,10 +208,10 @@ export default function Page() {
       setPopupShown(true);
       setYesPressed(false);
     }
-  }, [yesPressed, noCount, popupShown]);
+  }, [yesPressed, isSuccessUnlocked, popupShown]);
 
   useEffect(() => {
-    if (yesPressed && noCount >= thresholds.successAfterNoCount && !yespopupShown) {
+    if (yesPressed && isSuccessUnlocked && !yespopupShown) {
       Swal.fire({
         title: dialogues.successPopup.title,
         width: dialogues.successPopup.width,
@@ -210,7 +228,7 @@ export default function Page() {
       setYesPopupShown(true);
       setYesPressed(true);
     }
-  }, [yesPressed, noCount, yespopupShown]);
+  }, [yesPressed, isSuccessUnlocked, yespopupShown]);
 
   useEffect(() => {
     if (noCount === thresholds.finalPersuasionCount) {
@@ -241,7 +259,7 @@ export default function Page() {
         yesPressed === false && <MouseStealing />}
 
       <div className="overflow-hidden flex flex-col items-center justify-center pt-4 h-screen -mt-16 selection:bg-rose-600 selection:text-white text-zinc-900">
-        {yesPressed && noCount >= thresholds.successAfterNoCount ? (
+        {yesPressed && isSuccessUnlocked ? (
           <>
             <img
               ref={gifRef}
@@ -334,3 +352,4 @@ const Footer = () => {
     </a>
   );
 };
+
