@@ -383,7 +383,6 @@ export default function Page() {
         >
           {isMuted ? <BsVolumeMuteFill size={26} /> : <BsVolumeUpFill size={26} />}
         </button>
-        <Footer />
       </div>
     </>
   );
