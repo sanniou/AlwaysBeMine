@@ -3,16 +3,20 @@ import { proposalConfig } from "./proposalConfig.js";
 
 const { dialogues, marquee } = proposalConfig;
 
-const MarqueeProposal = () => {
+const MarqueeProposal = ({ isActive = true }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const sentences = dialogues.marqueeSentences;
 
   useEffect(() => {
+    if (!isActive) {
+      return undefined;
+    }
+
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % sentences.length);
     }, marquee.intervalMs);
     return () => clearInterval(interval);
-  }, [sentences.length]);
+  }, [isActive, sentences.length]);
 
   return (
     <div
@@ -35,7 +39,7 @@ const MarqueeProposal = () => {
         style={{
           whiteSpace: "nowrap",
           position: "absolute",
-          animation: `marquee ${marquee.animationDurationSec}s linear infinite`,
+          animation: isActive ? `marquee ${marquee.animationDurationSec}s linear infinite` : "none",
         }}
         key={currentIndex}
       >

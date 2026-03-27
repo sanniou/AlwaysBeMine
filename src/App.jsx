@@ -25,6 +25,7 @@ export default function Page() {
   const [isMuted, setIsMuted] = useState(false);
   const [popupShown, setPopupShown] = useState(false);
   const [yespopupShown, setYesPopupShown] = useState(false);
+  const [successPopupConfirmed, setSuccessPopupConfirmed] = useState(false);
   const [earlyYesSkipped, setEarlyYesSkipped] = useState(false);
 
   const gifRef = useRef(null);
@@ -224,6 +225,8 @@ export default function Page() {
           right
           no-repeat
         `,
+      }).then(() => {
+        setSuccessPopupConfirmed(true);
       });
       setYesPopupShown(true);
       setYesPressed(true);
@@ -279,7 +282,7 @@ export default function Page() {
             >
               {titles.successSubtitle}
             </div>
-            <WordMareque />
+            <WordMareque isActive={successPopupConfirmed} />
           </>
         ) : (
           <>
@@ -352,4 +355,3 @@ const Footer = () => {
     </a>
   );
 };
-
