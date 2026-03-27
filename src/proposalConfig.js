@@ -7,9 +7,6 @@ import swalbg from "./assets/Lovingbg2_main.jpg";
 import loveu from "./assets/GifData/cutieSwal4.gif";
 
 import yesgif0 from "./assets/GifData/Yes/lovecutie0.gif";
-import yesgif1 from "./assets/GifData/Yes/love2.gif";
-import yesgif2 from "./assets/GifData/Yes/love3.gif";
-import yesgif3 from "./assets/GifData/Yes/love1.gif";
 import yesgif4 from "./assets/GifData/Yes/lovecutie1.gif";
 import yesgif5 from "./assets/GifData/Yes/lovecutie5.gif";
 import yesgif6 from "./assets/GifData/Yes/lovecutie7.gif";

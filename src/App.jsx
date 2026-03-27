@@ -171,9 +171,6 @@ export default function Page() {
 
     if (isSuccessUnlocked) {
       setYesPressed(true);
-      if (audio.autoplayAfterEarlyYesSkip) {
-        playMusic(audio.yesTracks[audio.startYesTrackIndex], audio.yesTracks);
-      }
     }
   };
 
@@ -213,6 +210,10 @@ export default function Page() {
 
   useEffect(() => {
     if (yesPressed && isSuccessUnlocked && !yespopupShown) {
+      if (audio.autoplayAfterEarlyYesSkip) {
+        playMusic(audio.yesTracks[audio.startYesTrackIndex], audio.yesTracks);
+      }
+
       Swal.fire({
         title: dialogues.successPopup.title,
         width: dialogues.successPopup.width,
@@ -228,6 +229,7 @@ export default function Page() {
       }).then(() => {
         setSuccessPopupConfirmed(true);
       });
+
       setYesPopupShown(true);
       setYesPressed(true);
     }

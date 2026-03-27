@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { proposalConfig } from "./proposalConfig.js";
 
 const { dialogues, marquee } = proposalConfig;
@@ -6,6 +7,7 @@ const { dialogues, marquee } = proposalConfig;
 const MarqueeProposal = ({ isActive = true }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const sentences = dialogues.marqueeSentences;
+  const initialOffset = "translateX(33%)";
 
   useEffect(() => {
     if (!isActive) {
@@ -32,13 +34,15 @@ const MarqueeProposal = ({ isActive = true }) => {
         border: "4px solid #ffffff",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "flex-start",
+        paddingLeft: "2rem",
       }}
     >
       <div
         style={{
           whiteSpace: "nowrap",
           position: "absolute",
+          transform: isActive ? undefined : initialOffset,
           animation: isActive ? `marquee ${marquee.animationDurationSec}s linear infinite` : "none",
         }}
         key={currentIndex}
@@ -59,7 +63,7 @@ const MarqueeProposal = ({ isActive = true }) => {
       <style>{`
         @keyframes marquee {
           0% {
-            transform: translateX(100%);
+            transform: translateX(33%);
           }
           100% {
             transform: translateX(-100%);
@@ -68,6 +72,10 @@ const MarqueeProposal = ({ isActive = true }) => {
       `}</style>
     </div>
   );
+};
+
+MarqueeProposal.propTypes = {
+  isActive: PropTypes.bool,
 };
 
 export default MarqueeProposal;
