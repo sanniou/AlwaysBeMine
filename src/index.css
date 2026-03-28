@@ -3,11 +3,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 :root {
   font-family: "Protest Riot", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -16,30 +18,190 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color-scheme: light;
 }
+
 body {
-  /* background: url("./assets/bg1.webp"); */
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(255, 232, 242, 0.95), rgba(255, 255, 255, 0.55) 35%, rgba(242, 230, 255, 0.35) 65%, rgba(255, 255, 255, 0.9) 100%),
+    linear-gradient(160deg, #fff4f8 0%, #f8ebff 50%, #fffaf5 100%);
   background-position: center;
   background-size: cover;
   background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.romance-bg {
+  filter: saturate(0.82) brightness(1.05) blur(0.3px);
+  transform: scale(1.03);
+}
+
+.romance-overlay {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.7), transparent 30%),
+    radial-gradient(circle at 80% 15%, rgba(255, 214, 235, 0.35), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(254, 240, 248, 0.45) 35%, rgba(248, 241, 255, 0.6));
+  backdrop-filter: blur(12px);
+}
+
+.hero-card,
+.success-shell {
+  position: relative;
   overflow: hidden;
 }
 
+.hero-card::before,
+.success-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.08));
+  pointer-events: none;
+}
+
+.hero-glow,
+.success-glow {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 189, 222, 0.78) 0%, rgba(255, 204, 229, 0.45) 42%, rgba(255, 255, 255, 0) 72%);
+  filter: blur(8px);
+  animation: glowPulse 6s ease-in-out infinite;
+}
+
+.success-glow {
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(245, 197, 255, 0.78) 0%, rgba(255, 214, 236, 0.4) 42%, rgba(255, 255, 255, 0) 72%);
+}
+
 .animate-bounce {
-  animation: float 3s ease-in-out infinite;
+  animation: float 3.4s ease-in-out infinite;
+}
+
+.marquee-shell {
+  width: 100%;
+  overflow: hidden;
+}
+
+.marquee-card {
+  max-width: min(720px, 100%);
+  transform: translateX(12%);
+  opacity: 0.96;
+  transition: transform 0.8s ease, opacity 0.8s ease, box-shadow 0.8s ease;
+}
+
+.marquee-card--active {
+  animation: readableSlide 18s linear infinite;
+  box-shadow: 0 18px 40px rgba(93, 31, 120, 0.12);
+}
+
+.marquee-card__english,
+.marquee-card__chinese {
+  margin: 0;
+  line-height: 1.7;
+  text-wrap: balance;
+}
+
+.marquee-card__english {
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow: 0 10px 30px rgba(68, 14, 83, 0.22);
+}
+
+.marquee-card__chinese {
+  margin-top: 0.55rem;
+  font-size: clamp(0.94rem, 1.5vw, 1.1rem);
+  color: rgba(255, 255, 255, 0.78);
 }
 
 @keyframes float {
   0% {
-    transform: translateY(0);
-    opacity: 1;
+    transform: translateY(0) scale(1);
+    opacity: 0.88;
   }
   50% {
-    transform: translateY(-20px);
-    opacity: 0.8;
+    transform: translateY(-22px) scale(1.04);
+    opacity: 1;
   }
   100% {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    opacity: 0.88;
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    transform: scale(0.95);
+    opacity: 0.78;
+  }
+  50% {
+    transform: scale(1.08);
     opacity: 1;
+  }
+}
+
+@keyframes readableSlide {
+  0% {
+    transform: translateX(12%);
+  }
+  12% {
+    transform: translateX(12%);
+  }
+  88% {
+    transform: translateX(-42%);
+  }
+  100% {
+    transform: translateX(-42%);
+  }
+}
+
+@media (max-width: 1024px) {
+  .marquee-card,
+  .marquee-card--active {
+    transform: none;
+    animation: none;
+  }
+
+  .marquee-card__english,
+  .marquee-card__chinese {
+    text-align: left;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+  }
+
+  .romance-bg {
+    filter: saturate(0.72) brightness(1.08);
+  }
+
+  .hero-glow,
+  .success-glow {
+    width: 220px;
+    height: 220px;
+  }
+
+  .marquee-card {
+    max-width: 100%;
+    transform: none;
+  }
+
+  .marquee-card__english {
+    font-size: 1rem;
+  }
+
+  .marquee-card__chinese {
+    font-size: 0.92rem;
   }
 }
