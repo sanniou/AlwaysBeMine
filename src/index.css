@@ -64,6 +64,17 @@ a {
 
 .scene {
   isolation: isolate;
+  min-height: 100dvh;
+}
+
+.scene-stage {
+  min-height: 100dvh;
+  padding-block: clamp(0.9rem, 2.6vh, 1.8rem);
+}
+
+.scene-panel {
+  border-radius: clamp(1.9rem, 4vw, 2.4rem);
+  padding: clamp(1rem, 2.8vw, 2rem);
 }
 
 .scene-copy-wave {
@@ -244,22 +255,42 @@ a {
 
 .hero-media,
 .success-media {
+  width: min(100%, 21rem);
+  height: clamp(10.75rem, 30vw, 18.75rem);
   border: 1px solid rgba(255, 255, 255, 0.56);
   box-shadow: 0 24px 60px rgba(92, 19, 115, 0.18);
 }
 
 .success-media {
+  width: min(100%, 22rem);
+  height: clamp(11rem, 32vw, 20.5rem);
   border-color: rgba(255, 244, 235, 0.3);
   box-shadow: 0 24px 60px rgba(24, 10, 38, 0.35);
 }
 
+.hero-layout,
+.success-layout {
+  gap: clamp(1.1rem, 3vw, 2.5rem);
+}
+
+.hero-media-wrap,
+.success-media-wrap {
+  min-width: 0;
+}
+
 .story-copy {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.72rem, 1.8vw, 1rem);
   color: var(--ink-deep);
 }
 
 .story-pill {
   border: 1px solid rgba(255, 255, 255, 0.45);
-  letter-spacing: 0.28em;
+  padding: clamp(0.72rem, 1.5vw, 0.85rem) clamp(1rem, 2.3vw, 1.35rem);
+  font-size: clamp(0.62rem, 1vw, 0.75rem);
+  letter-spacing: 0.24em;
+  line-height: 1.2;
 }
 
 .story-pill--intro {
@@ -277,11 +308,14 @@ a {
 .eyebrow-line {
   font-family: var(--font-body);
   font-weight: 600;
-  letter-spacing: 0.18em;
+  font-size: clamp(0.82rem, 1.45vw, 1rem);
+  line-height: 1.3;
+  letter-spacing: 0.16em;
   color: rgba(114, 60, 85, 0.74);
 }
 
 .display-title {
+  font-size: clamp(2.35rem, 5.8vw, 5rem);
   line-height: 1.08;
   text-wrap: balance;
 }
@@ -297,19 +331,22 @@ a {
 }
 
 .script-line {
-  line-height: 1.15;
+  font-size: clamp(1.7rem, 4.3vw, 2.55rem);
+  line-height: 1.06;
   color: rgba(136, 73, 99, 0.92);
   text-shadow: 0 10px 24px rgba(255, 255, 255, 0.28);
 }
 
 .success-subtitle {
+  font-size: clamp(1.08rem, 2.35vw, 1.72rem);
   color: rgba(255, 238, 232, 0.92);
-  line-height: 1.65;
+  line-height: 1.48;
   text-shadow: 0 8px 24px rgba(14, 6, 14, 0.28);
 }
 
 .body-copy {
-  line-height: 1.9;
+  font-size: clamp(0.93rem, 1.45vw, 1.05rem);
+  line-height: 1.72;
 }
 
 .body-copy--soft {
@@ -317,6 +354,8 @@ a {
 }
 
 .proposal-button {
+  min-height: clamp(3rem, 8vw, 3.85rem);
+  padding: clamp(0.74rem, 1.45vw, 0.98rem) clamp(1.2rem, 2.8vw, 1.7rem);
   transition:
     transform 0.35s ease,
     box-shadow 0.35s ease,
@@ -361,6 +400,7 @@ a {
 }
 
 .story-card {
+  padding: clamp(0.95rem, 2vw, 1.15rem);
   border: 1px solid rgba(255, 255, 255, 0.54);
   background: linear-gradient(155deg, rgba(255, 255, 255, 0.34), rgba(255, 247, 250, 0.2));
   box-shadow:
@@ -370,16 +410,19 @@ a {
 }
 
 .story-card__label {
+  font-size: clamp(0.63rem, 0.9vw, 0.75rem);
   letter-spacing: 0.28em;
   color: rgba(162, 74, 113, 0.72);
 }
 
 .story-card__body {
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
   color: rgba(79, 45, 63, 0.82);
-  line-height: 1.9;
+  line-height: 1.65;
 }
 
 .marquee-frame {
+  padding: clamp(0.95rem, 2.2vw, 1.45rem);
   border: 1px solid rgba(255, 247, 240, 0.1);
   background:
     linear-gradient(145deg, rgba(27, 13, 22, 0.54), rgba(63, 31, 45, 0.36)),
@@ -391,8 +434,33 @@ a {
 
 .success-caption-line {
   color: rgba(255, 233, 229, 0.92);
-  font-size: clamp(1.9rem, 4.5vw, 2.8rem);
-  line-height: 1;
+  font-size: clamp(1.5rem, 3.8vw, 2.45rem);
+  line-height: 1.06;
+}
+
+.hero-actions {
+  margin-top: clamp(0.95rem, 2.4vw, 1.75rem);
+  gap: clamp(0.7rem, 1.8vw, 0.95rem);
+}
+
+.story-meta-grid {
+  margin-top: clamp(1rem, 2.5vw, 1.8rem);
+  gap: clamp(0.7rem, 1.6vw, 0.95rem);
+}
+
+.success-marquee {
+  margin-top: clamp(1rem, 2.5vw, 1.8rem);
+}
+
+.success-promise {
+  max-width: 40rem;
+}
+
+.story-copy[data-copy-locale="zh"] .script-line,
+.story-copy[data-copy-locale="zh"] .success-caption-line {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  line-height: 1.28;
 }
 
 .mute-toggle {
@@ -520,9 +588,9 @@ a {
 }
 
 .marquee-card {
-  min-height: 172px;
-  padding: 1.35rem 1.4rem 1.2rem;
-  border-radius: 1.55rem;
+  min-height: clamp(9rem, 17vw, 10.75rem);
+  padding: clamp(1rem, 1.8vw, 1.25rem) clamp(1rem, 2vw, 1.3rem) clamp(0.95rem, 1.8vw, 1.15rem);
+  border-radius: clamp(1.25rem, 2.4vw, 1.55rem);
   border: 1px solid rgba(255, 241, 245, 0.12);
   background:
     radial-gradient(circle at top right, rgba(255, 221, 231, 0.12), transparent 26%),
@@ -547,10 +615,10 @@ a {
 
 .marquee-card__quote-mark {
   position: absolute;
-  top: -0.55rem;
+  top: -0.45rem;
   left: -0.15rem;
   font-family: var(--font-script);
-  font-size: 4.4rem;
+  font-size: clamp(3.1rem, 5.6vw, 4.4rem);
   line-height: 1;
   color: rgba(255, 226, 235, 0.3);
   pointer-events: none;
@@ -564,23 +632,23 @@ a {
 }
 
 .marquee-card__english {
-  min-height: 3.8em;
-  padding-left: 1.25rem;
+  min-height: 0;
+  padding-left: clamp(0.95rem, 1.8vw, 1.25rem);
   font-family: var(--font-display);
-  font-size: clamp(1.05rem, 1.85vw, 1.34rem);
-  line-height: 1.72;
+  font-size: clamp(0.98rem, 1.55vw, 1.26rem);
+  line-height: 1.58;
   color: rgba(255, 248, 250, 0.98);
   text-shadow: 0 10px 28px rgba(12, 5, 22, 0.34);
   animation: marqueeLineIn 0.82s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
 .marquee-card__chinese {
-  min-height: 3.3em;
-  margin-top: 0.8rem;
-  padding-left: 1.25rem;
+  min-height: 0;
+  margin-top: clamp(0.55rem, 1.2vw, 0.8rem);
+  padding-left: clamp(0.95rem, 1.8vw, 1.25rem);
   font-family: var(--font-body);
-  font-size: clamp(0.95rem, 1.5vw, 1.08rem);
-  line-height: 1.86;
+  font-size: clamp(0.9rem, 1.25vw, 1.03rem);
+  line-height: 1.68;
   color: rgba(243, 230, 239, 0.88);
   transform: translateY(8px);
   opacity: 0;
@@ -795,46 +863,90 @@ a {
     height: 220px;
   }
 
-  .display-title--intro,
-  .display-title--success {
-    font-size: 2.55rem;
-    line-height: 1.08;
+  .scene-stage {
+    padding-inline: 1rem;
+    padding-block: 1rem;
+  }
+
+  .scene-panel {
+    padding: 0.95rem;
+  }
+
+  .hero-layout,
+  .success-layout {
+    gap: 1rem;
+  }
+
+  .hero-media {
+    width: min(100%, 18rem);
+    height: 11rem;
+  }
+
+  .success-media {
+    width: min(100%, 18.5rem);
+    height: 11.5rem;
+  }
+
+  .story-pill {
+    letter-spacing: 0.18em;
+  }
+
+  .eyebrow-line {
+    letter-spacing: 0.11em;
+  }
+
+  .display-title {
+    font-size: clamp(2rem, 10vw, 2.8rem);
+    line-height: 1.06;
   }
 
   .script-line {
-    font-size: 1.9rem;
+    font-size: clamp(1.45rem, 7.6vw, 2rem);
+  }
+
+  .success-subtitle {
+    line-height: 1.42;
   }
 
   .story-card__body,
-  .body-copy,
-  .success-subtitle {
-    line-height: 1.75;
+  .body-copy {
+    line-height: 1.6;
+  }
+
+  .proposal-button {
+    min-width: min(100%, 10.8rem);
+  }
+
+  .story-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .success-marquee {
+    margin-top: 0.85rem;
   }
 
   .marquee-card {
-    min-height: 182px;
-    padding: 1rem 1rem 1.05rem;
+    min-height: 0;
+    padding: 0.95rem 0.95rem 1rem;
   }
 
   .marquee-card__english {
-    min-height: 4.8em;
-    padding-left: 1rem;
-    font-size: 1rem;
+    font-size: 0.98rem;
+    line-height: 1.48;
   }
 
   .marquee-card__chinese {
-    min-height: 4.4em;
-    padding-left: 1rem;
-    font-size: 0.92rem;
+    font-size: 0.9rem;
+    line-height: 1.58;
   }
 
   .marquee-card__quote-mark {
     left: -0.05rem;
-    font-size: 3.6rem;
+    font-size: 3.5rem;
   }
 
   .success-caption-line {
-    font-size: 2.2rem;
+    font-size: 1.9rem;
   }
 
   .preloader-orb {
@@ -852,5 +964,11 @@ a {
 
   .preloader-subtitle {
     font-size: 2rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .story-meta-grid {
+    grid-template-columns: 1fr;
   }
 }

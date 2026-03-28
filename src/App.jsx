@@ -336,35 +336,39 @@ export default function Page() {
         ))}
 
         {isRevealed ? (
-          <div className="relative z-20 flex min-h-screen items-center justify-center px-4 py-8 md:px-8">
-            <div className="success-shell success-shell--revealed w-full max-w-6xl rounded-[2.4rem] p-5 md:p-8">
-              <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
-                <div className="relative flex justify-center">
+          <div className="scene-stage relative z-20 flex items-center justify-center px-4 py-8 md:px-8">
+            <div className="scene-panel success-shell success-shell--revealed w-full max-w-6xl">
+              <div className="success-layout grid items-center md:grid-cols-[minmax(0,300px)_1fr] xl:grid-cols-[minmax(0,420px)_1fr]">
+                <div className="success-media-wrap relative flex justify-center">
                   <div className="success-glow" />
                   <img
                     ref={gifRef}
-                    className="success-media relative z-10 h-[240px] w-auto rounded-[2rem] object-cover md:h-[330px]"
+                    className="success-media relative z-10 rounded-[2rem] object-cover"
                     src={media.yesGifs[currentGifIndex]}
                     alt="Yes Response"
                   />
                 </div>
 
-                <div className="story-copy text-center lg:text-left" data-copy-reveal="true">
-                  <div className="story-pill story-pill--success mb-4 inline-flex rounded-full px-4 py-2 text-xs uppercase shadow-sm">
+                <div
+                  className="story-copy story-copy--success text-center md:text-left"
+                  data-copy-locale={isChineseCopyEnabled ? "zh" : "en"}
+                  data-copy-reveal="true"
+                >
+                  <div className="story-pill story-pill--success inline-flex rounded-full uppercase shadow-sm">
                     {localizedEyebrow}
                   </div>
-                  <h1 className="type-display display-title display-title--success text-4xl md:text-6xl">
+                  <h1 className="type-display display-title display-title--success">
                     {localizedSuccessTitle}
                   </h1>
-                  <p className="type-body success-subtitle mt-4 max-w-2xl text-lg md:text-2xl">
+                  <p className="type-body success-subtitle max-w-2xl">
                     {localizedSuccessSubtitle}
                   </p>
-                  <p className="type-body body-copy body-copy--soft mt-5 max-w-2xl text-sm md:text-base">
+                  <p className="type-body body-copy body-copy--soft success-promise max-w-2xl">
                     {localizedPromise}
                   </p>
 
-                  <div className="marquee-frame mt-8 rounded-[1.8rem] px-4 py-5 md:px-6">
-                    <p className="type-script success-caption-line mb-4 text-center lg:text-left" data-copy-reveal="true">
+                  <div className="marquee-frame success-marquee rounded-[1.8rem]">
+                    <p className="type-script success-caption-line text-center md:text-left" data-copy-reveal="true">
                       {localizedSuccessCaption}
                     </p>
                     <WordMareque isActive={successPopupConfirmed} />
@@ -374,10 +378,10 @@ export default function Page() {
             </div>
           </div>
         ) : (
-          <div className="relative z-20 flex min-h-screen items-center justify-center px-4 py-8 md:px-8">
-            <div className="hero-card hero-card--intro w-full max-w-5xl rounded-[2.4rem] px-5 py-8 md:px-8 md:py-10">
-              <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,380px)_1fr]">
-                <div className="relative flex items-center justify-center">
+          <div className="scene-stage relative z-20 flex items-center justify-center px-4 py-8 md:px-8">
+            <div className="scene-panel hero-card hero-card--intro w-full max-w-5xl">
+              <div className="hero-layout grid items-center md:grid-cols-[minmax(0,280px)_1fr] xl:grid-cols-[minmax(0,380px)_1fr]">
+                <div className="hero-media-wrap relative flex items-center justify-center">
                   <div className="hero-glow" />
                   <img
                     src={media.loveSvg}
@@ -386,39 +390,39 @@ export default function Page() {
                   />
                   <img
                     ref={gifRef}
-                    className="hero-media relative z-10 h-[230px] rounded-[2rem] object-cover md:h-[300px]"
+                    className="hero-media relative z-10 rounded-[2rem] object-cover"
                     src={media.initialGif}
                     alt="Love Animation"
                   />
                 </div>
 
-                <div className="story-copy text-center lg:text-left">
+                <div className="story-copy story-copy--intro text-center md:text-left" data-copy-locale={isChineseCopyEnabled ? "zh" : "en"}>
                   <div
-                    className="story-pill story-pill--intro inline-flex rounded-full px-4 py-2 text-[11px] uppercase shadow-sm"
+                    className="story-pill story-pill--intro inline-flex rounded-full uppercase shadow-sm"
                     data-copy-reveal="true"
                   >
                     {localizedBadge}
                   </div>
                   <p
-                    className="eyebrow-line mt-4 text-sm md:text-base uppercase"
+                    className="eyebrow-line story-kicker uppercase"
                     data-copy-reveal="true"
                   >
                     {localizedEyebrow}
                   </p>
                   <h1
-                    className="type-display display-title display-title--intro mt-4 text-4xl md:text-6xl"
+                    className="type-display display-title display-title--intro story-title"
                     data-copy-reveal="true"
                   >
                     {localizedMainTitle}
                   </h1>
                   <p
-                    className="type-script script-line mt-5 max-w-2xl text-2xl md:text-[2.2rem]"
+                    className="type-script script-line support-copy max-w-2xl"
                     data-copy-reveal="true"
                   >
                     {localizedSupportLine}
                   </p>
 
-                  <div className="proposal-actions mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+                  <div className="proposal-actions hero-actions flex flex-wrap justify-center md:justify-start">
                     <button
                       onMouseEnter={handleMouseEnterYes}
                       onMouseLeave={handleMouseLeave}
@@ -446,12 +450,12 @@ export default function Page() {
                     </button>
                   </div>
 
-                  <div className="mt-8 grid gap-3 text-left md:grid-cols-2">
-                    <div className="story-card rounded-[1.5rem] px-4 py-4 shadow-sm" data-copy-reveal="true">
+                  <div className="story-meta-grid grid text-left md:grid-cols-2">
+                    <div className="story-card rounded-[1.5rem] shadow-sm" data-copy-reveal="true">
                       <p className="story-card__label text-xs uppercase">{localizedPromiseCardLabel}</p>
                       <p className="type-body story-card__body mt-2 text-sm">{localizedPromise}</p>
                     </div>
-                    <div className="story-card rounded-[1.5rem] px-4 py-4 shadow-sm" data-copy-reveal="true">
+                    <div className="story-card rounded-[1.5rem] shadow-sm" data-copy-reveal="true">
                       <p className="story-card__label text-xs uppercase">{localizedBraveryCardLabel}</p>
                       <p className="type-body story-card__body mt-2 text-sm">
                         {isSuccessUnlocked
