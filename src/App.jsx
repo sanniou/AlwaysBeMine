@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Spline from "@splinetool/react-spline";
 import Swal from "sweetalert2";
 import { BsVolumeUpFill, BsVolumeMuteFill } from "react-icons/bs";
@@ -12,11 +12,22 @@ const {
   titles,
   buttons,
   dialogues,
+  labels,
   thresholds,
   audio,
   media,
   ui,
 } = proposalConfig;
+
+const MAX_YES_BUTTON_FONT_SIZE = 72;
+
+const getLocalizedCopy = (copy, isChineseCopyEnabled) => {
+  if (copy && typeof copy === "object" && "en" in copy && "zh" in copy) {
+    return copy[isChineseCopyEnabled ? "zh" : "en"];
+  }
+
+  return copy;
+};
 
 export default function Page() {
   const [noCount, setNoCount] = useState(0);
@@ -28,9 +39,12 @@ export default function Page() {
   const [yespopupShown, setYesPopupShown] = useState(false);
   const [successPopupConfirmed, setSuccessPopupConfirmed] = useState(false);
   const [earlyYesSkipped, setEarlyYesSkipped] = useState(false);
+  const [isChineseCopyEnabled, setIsChineseCopyEnabled] = useState(false);
 
   const gifRef = useRef(null);
-  const yesButtonSize = noCount * ui.yesButtonGrowPerNo + ui.yesButtonBaseSize;
+  const rawYesButtonSize = noCount * ui.yesButtonGrowPerNo + ui.yesButtonBaseSize;
+  const yesButtonSize = Math.min(rawYesButtonSize, MAX_YES_BUTTON_FONT_SIZE);
+  const isYesButtonMaxed = rawYesButtonSize > MAX_YES_BUTTON_FONT_SIZE;
 
   const [floatingGifs, setFloatingGifs] = useState([]);
 
@@ -39,6 +53,25 @@ export default function Page() {
     noCount > thresholds.mouseStealerStartExclusive &&
     noCount < thresholds.mouseStealerEndExclusive &&
     yesPressed === false;
+  const localizedBadge = getLocalizedCopy(profile.badge, isChineseCopyEnabled);
+  const localizedEyebrow = getLocalizedCopy(profile.eyebrow, isChineseCopyEnabled);
+  const localizedPromise = getLocalizedCopy(profile.promise, isChineseCopyEnabled);
+  const localizedSupportLine = getLocalizedCopy(profile.supportLine, isChineseCopyEnabled);
+  const localizedMainTitle = getLocalizedCopy(titles.main, isChineseCopyEnabled);
+  const localizedSuccessTitle = getLocalizedCopy(titles.success, isChineseCopyEnabled);
+  const localizedSuccessSubtitle = getLocalizedCopy(titles.successSubtitle, isChineseCopyEnabled);
+  const localizedYesLabel = getLocalizedCopy(buttons.yesLabel, isChineseCopyEnabled);
+  const localizedNoInitialLabel = getLocalizedCopy(buttons.noInitialLabel, isChineseCopyEnabled);
+  const localizedNoPhrases = getLocalizedCopy(buttons.noPhrases, isChineseCopyEnabled);
+  const localizedEarlyYesTitle = getLocalizedCopy(dialogues.earlyYesPopup.title, isChineseCopyEnabled);
+  const localizedSuccessPopupTitle = getLocalizedCopy(dialogues.successPopup.title, isChineseCopyEnabled);
+  const localizedFinalNoTitle = getLocalizedCopy(dialogues.finalNoPopup.title, isChineseCopyEnabled);
+  const localizedPopupConfirmText = getLocalizedCopy(dialogues.confirmButtonText, isChineseCopyEnabled);
+  const localizedSuccessCaption = getLocalizedCopy(dialogues.successCaption, isChineseCopyEnabled);
+  const localizedPromiseCardLabel = getLocalizedCopy(labels.promiseCard, isChineseCopyEnabled);
+  const localizedBraveryCardLabel = getLocalizedCopy(labels.braveryCard, isChineseCopyEnabled);
+  const localizedSuccessReady = getLocalizedCopy(labels.successReady, isChineseCopyEnabled);
+  const localizedGatheringCourage = getLocalizedCopy(labels.gatheringCourage, isChineseCopyEnabled);
 
   const generateRandomPositionWithSpacing = (existingPositions) => {
     let position;
@@ -93,26 +126,29 @@ export default function Page() {
     setFloatingGifs([]);
   };
 
-  const playMusic = (url, musicArray) => {
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
-    }
+  const playMusic = useCallback(
+    (url, musicArray) => {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
 
-    const audioInstance = new Audio(url);
-    audioInstance.muted = isMuted;
-    setCurrentAudio(audioInstance);
+      const audioInstance = new Audio(url);
+      audioInstance.muted = isMuted;
+      setCurrentAudio(audioInstance);
 
-    if (audio.autoAdvanceOnEnd) {
-      audioInstance.addEventListener("ended", () => {
-        const currentIndex = musicArray.indexOf(url);
-        const nextIndex = (currentIndex + 1) % musicArray.length;
-        playMusic(musicArray[nextIndex], musicArray);
-      });
-    }
+      if (audio.autoAdvanceOnEnd) {
+        audioInstance.addEventListener("ended", () => {
+          const currentIndex = musicArray.indexOf(url);
+          const nextIndex = (currentIndex + 1) % musicArray.length;
+          playMusic(musicArray[nextIndex], musicArray);
+        });
+      }
 
-    audioInstance.play();
-  };
+      audioInstance.play();
+    },
+    [currentAudio, isMuted],
+  );
 
   useEffect(() => {
     if (gifRef.current && yesPressed && isSuccessUnlocked) {
@@ -131,12 +167,6 @@ export default function Page() {
 
     return undefined;
   }, [yesPressed, isSuccessUnlocked]);
-
-  useEffect(() => {
-    if (gifRef.current) {
-      gifRef.current.src = gifRef.current.src;
-    }
-  }, [noCount]);
 
   useEffect(() => {
     if (isSuccessUnlocked) {
@@ -188,14 +218,20 @@ export default function Page() {
     setIsMuted(!isMuted);
   };
 
+  const handleCopyRevealCapture = (event) => {
+    if (event.target.closest('[data-copy-reveal="true"]')) {
+      setIsChineseCopyEnabled((previous) => !previous);
+    }
+  };
+
   const getNoButtonText = () => {
-    return buttons.noPhrases[Math.min(noCount, buttons.noPhrases.length - 1)];
+    return localizedNoPhrases[Math.min(noCount, localizedNoPhrases.length - 1)];
   };
 
   useEffect(() => {
     if (yesPressed && !isSuccessUnlocked && !popupShown) {
       Swal.fire({
-        title: dialogues.earlyYesPopup.title,
+        title: localizedEarlyYesTitle,
         showClass: {
           popup: dialogues.earlyYesPopup.showClassPopup,
         },
@@ -209,12 +245,13 @@ export default function Page() {
           center right
           no-repeat
         `,
+        confirmButtonText: localizedPopupConfirmText,
         confirmButtonColor: "#ec4899",
       });
       setPopupShown(true);
       setYesPressed(false);
     }
-  }, [yesPressed, isSuccessUnlocked, popupShown]);
+  }, [yesPressed, isSuccessUnlocked, popupShown, localizedEarlyYesTitle, localizedPopupConfirmText]);
 
   useEffect(() => {
     if (yesPressed && isSuccessUnlocked && !yespopupShown) {
@@ -223,7 +260,7 @@ export default function Page() {
       }
 
       Swal.fire({
-        title: dialogues.successPopup.title,
+        title: localizedSuccessPopupTitle,
         width: dialogues.successPopup.width,
         padding: dialogues.successPopup.padding,
         color: dialogues.successPopup.color,
@@ -234,6 +271,7 @@ export default function Page() {
           center right
           no-repeat
         `,
+        confirmButtonText: localizedPopupConfirmText,
         confirmButtonColor: "#ec4899",
       }).then(() => {
         setSuccessPopupConfirmed(true);
@@ -242,12 +280,12 @@ export default function Page() {
       setYesPopupShown(true);
       setYesPressed(true);
     }
-  }, [yesPressed, isSuccessUnlocked, yespopupShown]);
+  }, [yesPressed, isSuccessUnlocked, yespopupShown, localizedSuccessPopupTitle, localizedPopupConfirmText, playMusic]);
 
   useEffect(() => {
     if (noCount === thresholds.finalPersuasionCount) {
       Swal.fire({
-        title: dialogues.finalNoPopup.title,
+        title: localizedFinalNoTitle,
         width: dialogues.finalNoPopup.width,
         padding: dialogues.finalNoPopup.padding,
         color: dialogues.finalNoPopup.color,
@@ -258,10 +296,11 @@ export default function Page() {
           center right
           no-repeat
         `,
+        confirmButtonText: localizedPopupConfirmText,
         confirmButtonColor: "#ec4899",
       });
     }
-  }, [noCount]);
+  }, [noCount, localizedFinalNoTitle, localizedPopupConfirmText]);
 
   return (
     <>
@@ -272,7 +311,10 @@ export default function Page() {
 
       {canShowMouseStealer && <MouseStealing />}
 
-      <div className="relative min-h-screen overflow-hidden selection:bg-rose-600 selection:text-white text-zinc-900">
+      <div
+        className="relative min-h-screen overflow-hidden selection:bg-rose-600 selection:text-white text-zinc-900"
+        onClickCapture={handleCopyRevealCapture}
+      >
         <div className="absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-white/30 via-white/5 to-transparent pointer-events-none" />
         <div className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-[#1b1025]/25 via-transparent to-transparent pointer-events-none" />
 
@@ -300,23 +342,23 @@ export default function Page() {
                   />
                 </div>
 
-                <div className="text-center lg:text-left">
+                <div className="text-center lg:text-left" data-copy-reveal="true">
                   <div className="mb-3 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs tracking-[0.25em] text-rose-100 shadow-sm uppercase">
-                    {profile.eyebrow}
+                    {localizedEyebrow}
                   </div>
                   <h1 className="text-4xl md:text-6xl font-bold leading-tight text-white drop-shadow-[0_12px_30px_rgba(12,5,22,0.55)]">
-                    {titles.success}
+                    {localizedSuccessTitle}
                   </h1>
                   <p className="mt-4 max-w-2xl text-lg md:text-2xl text-rose-50 font-medium leading-relaxed drop-shadow-[0_8px_24px_rgba(12,5,22,0.42)]">
-                    {titles.successSubtitle}
+                    {localizedSuccessSubtitle}
                   </p>
                   <p className="mt-5 max-w-2xl text-sm md:text-base text-white/72 leading-7">
-                    {profile.promise}
+                    {localizedPromise}
                   </p>
 
                   <div className="mt-8 rounded-[1.5rem] border border-white/12 bg-[linear-gradient(145deg,rgba(16,8,22,0.68),rgba(42,22,54,0.52))] px-4 py-4 shadow-[0_18px_45px_rgba(10,5,18,0.34)] md:px-6">
                     <p className="mb-3 text-xs uppercase tracking-[0.28em] text-white/55">
-                      {dialogues.successCaption}
+                      {localizedSuccessCaption}
                     </p>
                     <WordMareque isActive={successPopupConfirmed} />
                   </div>
@@ -344,28 +386,46 @@ export default function Page() {
                 </div>
 
                 <div className="text-center lg:text-left">
-                  <div className="inline-flex rounded-full border border-white/60 bg-white/35 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-rose-700 shadow-sm">
-                    {profile.badge}
+                  <div
+                    className="inline-flex rounded-full border border-white/60 bg-white/35 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-rose-700 shadow-sm"
+                    data-copy-reveal="true"
+                  >
+                    {localizedBadge}
                   </div>
-                  <p className="mt-4 text-sm md:text-base font-medium tracking-[0.12em] text-rose-900/70 uppercase">
-                    {profile.eyebrow}
+                  <p
+                    className="mt-4 text-sm md:text-base font-medium tracking-[0.12em] text-rose-900/70 uppercase"
+                    data-copy-reveal="true"
+                  >
+                    {localizedEyebrow}
                   </p>
-                  <h1 className="mt-4 text-4xl md:text-6xl leading-tight text-zinc-900 drop-shadow-[0_12px_35px_rgba(255,255,255,0.35)]">
-                    {titles.main}
+                  <h1
+                    className="mt-4 text-4xl md:text-6xl leading-tight text-zinc-900 drop-shadow-[0_12px_35px_rgba(255,255,255,0.35)]"
+                    data-copy-reveal="true"
+                  >
+                    {localizedMainTitle}
                   </h1>
-                  <p className="mt-5 max-w-2xl text-base md:text-lg leading-8 text-zinc-800/80">
-                    {profile.supportLine}
+                  <p
+                    className="mt-5 max-w-2xl text-base md:text-lg leading-8 text-zinc-800/80"
+                    data-copy-reveal="true"
+                  >
+                    {localizedSupportLine}
                   </p>
 
                   <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
                     <button
                       onMouseEnter={handleMouseEnterYes}
                       onMouseLeave={handleMouseLeave}
-                      className="group rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 px-6 py-3 text-white shadow-[0_16px_40px_rgba(236,72,153,0.32)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_55px_rgba(236,72,153,0.42)]"
-                      style={{ fontSize: yesButtonSize }}
+                      className="group max-w-full rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 px-6 py-3 text-center text-white shadow-[0_16px_40px_rgba(236,72,153,0.32)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_55px_rgba(236,72,153,0.42)]"
+                      style={{
+                        fontSize: yesButtonSize,
+                        lineHeight: 1.1,
+                        maxWidth: "100%",
+                        whiteSpace: isYesButtonMaxed ? "normal" : "nowrap",
+                        width: isYesButtonMaxed ? "min(100%, 24rem)" : "auto",
+                      }}
                       onClick={handleYesClick}
                     >
-                      <span className="font-bold tracking-wide">{buttons.yesLabel}</span>
+                      <span className="font-bold tracking-wide">{localizedYesLabel}</span>
                     </button>
                     <button
                       onMouseEnter={handleMouseEnterNo}
@@ -373,21 +433,23 @@ export default function Page() {
                       onClick={handleNoClick}
                       className="rounded-full border border-rose-200/70 bg-white/60 px-6 py-3 text-rose-700 shadow-[0_12px_32px_rgba(255,255,255,0.22)] transition duration-300 hover:-translate-y-1 hover:bg-white/80 hover:shadow-[0_18px_44px_rgba(236,72,153,0.18)]"
                     >
-                      <span className="font-bold tracking-wide">{noCount === 0 ? buttons.noInitialLabel : getNoButtonText()}</span>
+                      <span className="font-bold tracking-wide">
+                        {noCount === 0 ? localizedNoInitialLabel : getNoButtonText()}
+                      </span>
                     </button>
                   </div>
 
                   <div className="mt-8 grid gap-3 text-left md:grid-cols-2">
-                    <div className="rounded-[1.35rem] border border-white/55 bg-white/28 px-4 py-4 shadow-sm">
-                      <p className="text-xs uppercase tracking-[0.28em] text-rose-700/70">Little promise</p>
-                      <p className="mt-2 text-sm leading-7 text-zinc-800/80">{profile.promise}</p>
+                    <div className="rounded-[1.35rem] border border-white/55 bg-white/28 px-4 py-4 shadow-sm" data-copy-reveal="true">
+                      <p className="text-xs uppercase tracking-[0.28em] text-rose-700/70">{localizedPromiseCardLabel}</p>
+                      <p className="mt-2 text-sm leading-7 text-zinc-800/80">{localizedPromise}</p>
                     </div>
-                    <div className="rounded-[1.35rem] border border-white/55 bg-white/24 px-4 py-4 shadow-sm">
-                      <p className="text-xs uppercase tracking-[0.28em] text-rose-700/70">Progress of bravery</p>
+                    <div className="rounded-[1.35rem] border border-white/55 bg-white/24 px-4 py-4 shadow-sm" data-copy-reveal="true">
+                      <p className="text-xs uppercase tracking-[0.28em] text-rose-700/70">{localizedBraveryCardLabel}</p>
                       <p className="mt-2 text-sm leading-7 text-zinc-800/80">
                         {isSuccessUnlocked
-                          ? "The page is ready for your yes — I’m just waiting for your final click."
-                          : `I am still gathering courage... ${Math.min(noCount + 1, thresholds.successAfterNoCount)}/${thresholds.successAfterNoCount}`}
+                          ? localizedSuccessReady
+                          : `${localizedGatheringCourage} ${Math.min(noCount + 1, thresholds.successAfterNoCount)}/${thresholds.successAfterNoCount}`}
                       </p>
                     </div>
                   </div>
@@ -407,20 +469,3 @@ export default function Page() {
     </>
   );
 }
-
-const Footer = () => {
-  return (
-    <a
-      className="fixed bottom-2 right-2 backdrop-blur-md opacity-80 hover:opacity-95 border p-1 rounded border-rose-300"
-      href="https://github.com/UjjwalSaini07"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Made with{" "}
-      <span role="img" aria-label="heart">
-        ❤️
-      </span>
-      {" "}by Ujjwal
-    </a>
-  );
-};

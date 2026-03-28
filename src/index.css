@@ -130,6 +130,21 @@ a {
   color: rgba(235, 224, 245, 0.86);
 }
 
+.swal2-popup {
+  border-radius: 1.6rem;
+}
+
+.swal2-popup .swal2-title {
+  font-size: clamp(1.2rem, 4.6vw, 1.9rem);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.swal2-popup .swal2-actions button {
+  border-radius: 999px;
+  padding-inline: 1.3rem;
+}
+
 @keyframes float {
   0% {
     transform: translateY(0) scale(1);
