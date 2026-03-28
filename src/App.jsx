@@ -40,6 +40,7 @@ export default function Page() {
   const [successPopupConfirmed, setSuccessPopupConfirmed] = useState(false);
   const [earlyYesSkipped, setEarlyYesSkipped] = useState(false);
   const [isChineseCopyEnabled, setIsChineseCopyEnabled] = useState(false);
+  const [copyPulseVersion, setCopyPulseVersion] = useState(0);
 
   const gifRef = useRef(null);
   const rawYesButtonSize = noCount * ui.yesButtonGrowPerNo + ui.yesButtonBaseSize;
@@ -49,6 +50,7 @@ export default function Page() {
   const [floatingGifs, setFloatingGifs] = useState([]);
 
   const isSuccessUnlocked = noCount >= thresholds.successAfterNoCount || earlyYesSkipped;
+  const isRevealed = yesPressed && isSuccessUnlocked;
   const canShowMouseStealer =
     noCount > thresholds.mouseStealerStartExclusive &&
     noCount < thresholds.mouseStealerEndExclusive &&
@@ -221,6 +223,7 @@ export default function Page() {
   const handleCopyRevealCapture = (event) => {
     if (event.target.closest('[data-copy-reveal="true"]')) {
       setIsChineseCopyEnabled((previous) => !previous);
+      setCopyPulseVersion((previous) => previous + 1);
     }
   };
 
@@ -304,19 +307,23 @@ export default function Page() {
 
   return (
     <>
-      <div className="romance-bg fixed inset-0 -z-20">
+      <div className={`romance-bg fixed inset-0 -z-20 ${isRevealed ? "romance-bg--success" : "romance-bg--intro"}`}>
         <Spline scene={media.splineSceneUrl} />
       </div>
-      <div className="romance-overlay fixed inset-0 -z-10" />
+      <div className={`romance-overlay fixed inset-0 -z-10 ${isRevealed ? "romance-overlay--success" : "romance-overlay--intro"}`} />
 
       {canShowMouseStealer && <MouseStealing />}
 
       <div
-        className="relative min-h-screen overflow-hidden selection:bg-rose-600 selection:text-white text-zinc-900"
+        className={`scene relative min-h-screen overflow-hidden selection:bg-rose-600 selection:text-white text-zinc-900 ${isRevealed ? "scene--success" : "scene--intro"}`}
         onClickCapture={handleCopyRevealCapture}
       >
+        {copyPulseVersion > 0 ? <div key={copyPulseVersion} className="scene-copy-wave" /> : null}
         <div className="absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-white/30 via-white/5 to-transparent pointer-events-none" />
         <div className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-[#1b1025]/25 via-transparent to-transparent pointer-events-none" />
+        <div className="scene-bloom scene-bloom--left" />
+        <div className="scene-bloom scene-bloom--right" />
+        <div className="scene-bloom scene-bloom--lower" />
 
         {floatingGifs.map((gif) => (
           <img
@@ -328,36 +335,36 @@ export default function Page() {
           />
         ))}
 
-        {yesPressed && isSuccessUnlocked ? (
+        {isRevealed ? (
           <div className="relative z-20 flex min-h-screen items-center justify-center px-4 py-8 md:px-8">
-            <div className="success-shell w-full max-w-6xl rounded-[2rem] border border-white/45 bg-[rgba(44,20,58,0.58)] p-5 shadow-[0_24px_80px_rgba(28,8,43,0.34)] backdrop-blur-2xl md:p-8">
+            <div className="success-shell success-shell--revealed w-full max-w-6xl rounded-[2.4rem] p-5 md:p-8">
               <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
                 <div className="relative flex justify-center">
                   <div className="success-glow" />
                   <img
                     ref={gifRef}
-                    className="relative z-10 h-[240px] w-auto rounded-[1.75rem] border border-white/30 object-cover shadow-[0_24px_60px_rgba(24,10,38,0.45)] md:h-[320px]"
+                    className="success-media relative z-10 h-[240px] w-auto rounded-[2rem] object-cover md:h-[330px]"
                     src={media.yesGifs[currentGifIndex]}
                     alt="Yes Response"
                   />
                 </div>
 
-                <div className="text-center lg:text-left" data-copy-reveal="true">
-                  <div className="mb-3 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs tracking-[0.25em] text-rose-100 shadow-sm uppercase">
+                <div className="story-copy text-center lg:text-left" data-copy-reveal="true">
+                  <div className="story-pill story-pill--success mb-4 inline-flex rounded-full px-4 py-2 text-xs uppercase shadow-sm">
                     {localizedEyebrow}
                   </div>
-                  <h1 className="text-4xl md:text-6xl font-bold leading-tight text-white drop-shadow-[0_12px_30px_rgba(12,5,22,0.55)]">
+                  <h1 className="type-display display-title display-title--success text-4xl md:text-6xl">
                     {localizedSuccessTitle}
                   </h1>
-                  <p className="mt-4 max-w-2xl text-lg md:text-2xl text-rose-50 font-medium leading-relaxed drop-shadow-[0_8px_24px_rgba(12,5,22,0.42)]">
+                  <p className="type-body success-subtitle mt-4 max-w-2xl text-lg md:text-2xl">
                     {localizedSuccessSubtitle}
                   </p>
-                  <p className="mt-5 max-w-2xl text-sm md:text-base text-white/72 leading-7">
+                  <p className="type-body body-copy body-copy--soft mt-5 max-w-2xl text-sm md:text-base">
                     {localizedPromise}
                   </p>
 
-                  <div className="mt-8 rounded-[1.5rem] border border-white/12 bg-[linear-gradient(145deg,rgba(16,8,22,0.68),rgba(42,22,54,0.52))] px-4 py-4 shadow-[0_18px_45px_rgba(10,5,18,0.34)] md:px-6">
-                    <p className="mb-3 text-xs uppercase tracking-[0.28em] text-white/55">
+                  <div className="marquee-frame mt-8 rounded-[1.8rem] px-4 py-5 md:px-6">
+                    <p className="type-script success-caption-line mb-4 text-center lg:text-left" data-copy-reveal="true">
                       {localizedSuccessCaption}
                     </p>
                     <WordMareque isActive={successPopupConfirmed} />
@@ -368,54 +375,54 @@ export default function Page() {
           </div>
         ) : (
           <div className="relative z-20 flex min-h-screen items-center justify-center px-4 py-8 md:px-8">
-            <div className="hero-card w-full max-w-5xl rounded-[2rem] border border-white/55 bg-white/12 px-5 py-8 shadow-[0_24px_80px_rgba(45,10,70,0.22)] backdrop-blur-2xl md:px-8 md:py-10">
+            <div className="hero-card hero-card--intro w-full max-w-5xl rounded-[2.4rem] px-5 py-8 md:px-8 md:py-10">
               <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,380px)_1fr]">
                 <div className="relative flex items-center justify-center">
                   <div className="hero-glow" />
                   <img
                     src={media.loveSvg}
-                    className="absolute -top-10 left-1/2 z-0 w-24 -translate-x-1/2 opacity-70 drop-shadow-[0_12px_28px_rgba(236,72,153,0.28)] md:w-32 lg:-top-14"
+                    className="hero-emblem absolute -top-10 left-1/2 z-0 w-24 -translate-x-1/2 md:w-32 lg:-top-14"
                     alt="Love SVG"
                   />
                   <img
                     ref={gifRef}
-                    className="relative z-10 h-[230px] rounded-[1.75rem] border border-white/70 object-cover shadow-[0_24px_60px_rgba(92,19,115,0.24)] md:h-[300px]"
+                    className="hero-media relative z-10 h-[230px] rounded-[2rem] object-cover md:h-[300px]"
                     src={media.initialGif}
                     alt="Love Animation"
                   />
                 </div>
 
-                <div className="text-center lg:text-left">
+                <div className="story-copy text-center lg:text-left">
                   <div
-                    className="inline-flex rounded-full border border-white/60 bg-white/35 px-4 py-2 text-[11px] uppercase tracking-[0.3em] text-rose-700 shadow-sm"
+                    className="story-pill story-pill--intro inline-flex rounded-full px-4 py-2 text-[11px] uppercase shadow-sm"
                     data-copy-reveal="true"
                   >
                     {localizedBadge}
                   </div>
                   <p
-                    className="mt-4 text-sm md:text-base font-medium tracking-[0.12em] text-rose-900/70 uppercase"
+                    className="eyebrow-line mt-4 text-sm md:text-base uppercase"
                     data-copy-reveal="true"
                   >
                     {localizedEyebrow}
                   </p>
                   <h1
-                    className="mt-4 text-4xl md:text-6xl leading-tight text-zinc-900 drop-shadow-[0_12px_35px_rgba(255,255,255,0.35)]"
+                    className="type-display display-title display-title--intro mt-4 text-4xl md:text-6xl"
                     data-copy-reveal="true"
                   >
                     {localizedMainTitle}
                   </h1>
                   <p
-                    className="mt-5 max-w-2xl text-base md:text-lg leading-8 text-zinc-800/80"
+                    className="type-script script-line mt-5 max-w-2xl text-2xl md:text-[2.2rem]"
                     data-copy-reveal="true"
                   >
                     {localizedSupportLine}
                   </p>
 
-                  <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+                  <div className="proposal-actions mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
                     <button
                       onMouseEnter={handleMouseEnterYes}
                       onMouseLeave={handleMouseLeave}
-                      className="group max-w-full rounded-full bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-500 px-6 py-3 text-center text-white shadow-[0_16px_40px_rgba(236,72,153,0.32)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_55px_rgba(236,72,153,0.42)]"
+                      className={`proposal-button proposal-button--yes max-w-full rounded-full px-6 py-3 text-center ${isYesButtonMaxed ? "proposal-button--maxed" : ""}`}
                       style={{
                         fontSize: yesButtonSize,
                         lineHeight: 1.1,
@@ -425,28 +432,28 @@ export default function Page() {
                       }}
                       onClick={handleYesClick}
                     >
-                      <span className="font-bold tracking-wide">{localizedYesLabel}</span>
+                      <span className="type-display font-bold tracking-wide">{localizedYesLabel}</span>
                     </button>
                     <button
                       onMouseEnter={handleMouseEnterNo}
                       onMouseLeave={handleMouseLeave}
                       onClick={handleNoClick}
-                      className="rounded-full border border-rose-200/70 bg-white/60 px-6 py-3 text-rose-700 shadow-[0_12px_32px_rgba(255,255,255,0.22)] transition duration-300 hover:-translate-y-1 hover:bg-white/80 hover:shadow-[0_18px_44px_rgba(236,72,153,0.18)]"
+                      className="proposal-button proposal-button--no rounded-full px-6 py-3"
                     >
-                      <span className="font-bold tracking-wide">
+                      <span className="type-body font-bold tracking-wide">
                         {noCount === 0 ? localizedNoInitialLabel : getNoButtonText()}
                       </span>
                     </button>
                   </div>
 
                   <div className="mt-8 grid gap-3 text-left md:grid-cols-2">
-                    <div className="rounded-[1.35rem] border border-white/55 bg-white/28 px-4 py-4 shadow-sm" data-copy-reveal="true">
-                      <p className="text-xs uppercase tracking-[0.28em] text-rose-700/70">{localizedPromiseCardLabel}</p>
-                      <p className="mt-2 text-sm leading-7 text-zinc-800/80">{localizedPromise}</p>
+                    <div className="story-card rounded-[1.5rem] px-4 py-4 shadow-sm" data-copy-reveal="true">
+                      <p className="story-card__label text-xs uppercase">{localizedPromiseCardLabel}</p>
+                      <p className="type-body story-card__body mt-2 text-sm">{localizedPromise}</p>
                     </div>
-                    <div className="rounded-[1.35rem] border border-white/55 bg-white/24 px-4 py-4 shadow-sm" data-copy-reveal="true">
-                      <p className="text-xs uppercase tracking-[0.28em] text-rose-700/70">{localizedBraveryCardLabel}</p>
-                      <p className="mt-2 text-sm leading-7 text-zinc-800/80">
+                    <div className="story-card rounded-[1.5rem] px-4 py-4 shadow-sm" data-copy-reveal="true">
+                      <p className="story-card__label text-xs uppercase">{localizedBraveryCardLabel}</p>
+                      <p className="type-body story-card__body mt-2 text-sm">
                         {isSuccessUnlocked
                           ? localizedSuccessReady
                           : `${localizedGatheringCourage} ${Math.min(noCount + 1, thresholds.successAfterNoCount)}/${thresholds.successAfterNoCount}`}
@@ -460,7 +467,7 @@ export default function Page() {
         )}
 
         <button
-          className="fixed bottom-8 right-8 z-30 rounded-full border border-white/60 bg-white/65 p-3 shadow-[0_16px_40px_rgba(82,20,106,0.18)] backdrop-blur-md transition hover:-translate-y-1 hover:bg-white/85"
+          className="mute-toggle fixed bottom-8 right-8 z-30 rounded-full p-3 transition"
           onClick={toggleMute}
         >
           {isMuted ? <BsVolumeMuteFill size={24} /> : <BsVolumeUpFill size={24} />}

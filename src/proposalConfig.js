@@ -236,6 +236,9 @@ export const proposalConfig = {
   },
   marquee: {
     intervalMs: 9000,
+    baseIntervalMs: 7800,
+    maxIntervalMs: 13200,
+    translationDelayMs: 320,
     animationDurationSec: 18,
   },
   preloader: {

@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { StrictMode, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import Preloader from './Preloaders/preloader1.jsx';
 import { proposalConfig } from './proposalConfig.js';
 import './index.css';
 
-function Root() {
+export function Root() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,11 +13,11 @@ function Root() {
     return () => clearTimeout(timer);
   }, []);
 
-  return (
-    <React.StrictMode>
-      {loading ? <Preloader /> : <App />}
-    </React.StrictMode>
-  );
+  return loading ? <Preloader /> : <App />;
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<Root />);
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <Root />
+  </StrictMode>,
+);
