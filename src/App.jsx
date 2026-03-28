@@ -179,6 +179,17 @@ const createButtonBurst = (kind) => {
   });
 };
 
+const createShuffledIndexQueue = (length) => {
+  const queue = Array.from({ length }, (_, index) => index);
+
+  for (let index = queue.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [queue[index], queue[swapIndex]] = [queue[swapIndex], queue[index]];
+  }
+
+  return queue;
+};
+
 export default function Page() {
   const [noCount, setNoCount] = useState(0);
   const [yesPressed, setYesPressed] = useState(false);
@@ -201,6 +212,9 @@ export default function Page() {
   const burstTimeoutsRef = useRef({ yes: null, no: null });
   const posterQueueRef = useRef([]);
   const shouldShowPosterInterludeRef = useRef(false);
+  const popupLanguageRef = useRef(isChineseCopyEnabled);
+  const activePopupRef = useRef({ popup: null, titleCopy: null });
+  popupLanguageRef.current = isChineseCopyEnabled;
   const yesButtonMorph = getYesButtonMorph(noCount);
   const yesButtonStyle = {
     "--yes-inline-size": yesButtonMorph.inlineSize,
@@ -234,6 +248,11 @@ export default function Page() {
   const localizedBraveryCardLabel = getLocalizedCopy(labels.braveryCard, isChineseCopyEnabled);
   const localizedSuccessReady = getLocalizedCopy(labels.successReady, isChineseCopyEnabled);
   const localizedGatheringCourage = getLocalizedCopy(labels.gatheringCourage, isChineseCopyEnabled);
+
+  const toggleCopyLanguage = useCallback(() => {
+    setIsChineseCopyEnabled((previous) => !previous);
+    setCopyPulseVersion((previous) => previous + 1);
+  }, []);
 
   const triggerButtonBurst = useCallback((kind) => {
     const particles = createButtonBurst(kind);
@@ -278,9 +297,7 @@ export default function Page() {
     }
 
     if (posterQueueRef.current.length === 0) {
-      posterQueueRef.current = posters
-        .map((_, index) => index)
-        .sort(() => Math.random() - 0.5);
+      posterQueueRef.current = createShuffledIndexQueue(posters.length);
     }
 
     const nextPosterIndex = posterQueueRef.current.pop();
@@ -425,10 +442,47 @@ export default function Page() {
     setIsMuted(!isMuted);
   };
 
+  const syncPopupCopy = useCallback((popup, titleCopy) => {
+    if (!popup || !titleCopy) {
+      return;
+    }
+
+    const isPopupChinese = popupLanguageRef.current;
+    const titleNode = popup.querySelector(".sweet-dialog__title");
+    const confirmButton = popup.querySelector(".sweet-dialog__confirm");
+
+    if (titleNode) {
+      titleNode.textContent = getLocalizedCopy(titleCopy, isPopupChinese);
+      titleNode.dataset.popupLang = isPopupChinese ? "zh" : "en";
+      titleNode.dataset.copyReveal = "true";
+      titleNode.tabIndex = 0;
+      titleNode.setAttribute("role", "button");
+      titleNode.setAttribute("aria-label", "Toggle language");
+    }
+
+    if (confirmButton) {
+      confirmButton.textContent = getLocalizedCopy(dialogues.confirmButtonText, isPopupChinese);
+    }
+
+    popup.dataset.popupLang = isPopupChinese ? "zh" : "en";
+  }, []);
+
+  const syncActivePopupCopy = useCallback(() => {
+    const { popup, titleCopy } = activePopupRef.current;
+
+    if (popup && titleCopy) {
+      syncPopupCopy(popup, titleCopy);
+    }
+  }, [syncPopupCopy]);
+
+  useEffect(() => {
+    popupLanguageRef.current = isChineseCopyEnabled;
+    syncActivePopupCopy();
+  }, [isChineseCopyEnabled, syncActivePopupCopy]);
+
   const handleCopyRevealCapture = (event) => {
     if (event.target.closest('[data-copy-reveal="true"]')) {
-      setIsChineseCopyEnabled((previous) => !previous);
-      setCopyPulseVersion((previous) => previous + 1);
+      toggleCopyLanguage();
     }
   };
 
@@ -441,7 +495,7 @@ export default function Page() {
       const { didOpen: extraDidOpen, willClose: extraWillClose, ...restExtraOptions } = extraOptions;
 
       return {
-        title: getLocalizedCopy(titleCopy, isChineseCopyEnabled),
+        title: getLocalizedCopy(titleCopy, popupLanguageRef.current),
         width: popupConfig.width,
         padding: popupConfig.padding,
         color: popupConfig.color,
@@ -452,7 +506,7 @@ export default function Page() {
           center right
           no-repeat
         `,
-        confirmButtonText: getLocalizedCopy(dialogues.confirmButtonText, isChineseCopyEnabled),
+        confirmButtonText: getLocalizedCopy(dialogues.confirmButtonText, popupLanguageRef.current),
         buttonsStyling: false,
         customClass: {
           popup: `sweet-dialog sweet-dialog--${variant}`,
@@ -460,48 +514,47 @@ export default function Page() {
           confirmButton: "sweet-dialog__confirm",
         },
         didOpen: (popup) => {
-          let isPopupChinese = isChineseCopyEnabled;
           const titleNode = popup.querySelector(".sweet-dialog__title");
-          const confirmButton = popup.querySelector(".sweet-dialog__confirm");
 
-          const syncPopupCopy = () => {
-            if (titleNode) {
-              titleNode.textContent = getLocalizedCopy(titleCopy, isPopupChinese);
-              titleNode.dataset.popupLang = isPopupChinese ? "zh" : "en";
-            }
-
-            if (confirmButton) {
-              confirmButton.textContent = getLocalizedCopy(dialogues.confirmButtonText, isPopupChinese);
-            }
-
-            popup.dataset.popupLang = isPopupChinese ? "zh" : "en";
+          const handlePopupCopyToggle = (event) => {
+            event?.stopPropagation?.();
+            toggleCopyLanguage();
           };
 
-          const handlePopupCopyToggle = () => {
-            isPopupChinese = !isPopupChinese;
-            syncPopupCopy();
+          const handlePopupCopyToggleKeyDown = (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              handlePopupCopyToggle(event);
+            }
           };
-
-          syncPopupCopy();
 
           if (titleNode) {
-            titleNode.dataset.copyReveal = "true";
             titleNode.addEventListener("click", handlePopupCopyToggle);
+            titleNode.addEventListener("keydown", handlePopupCopyToggleKeyDown);
           }
 
+          activePopupRef.current = { popup, titleCopy };
+          syncPopupCopy(popup, titleCopy);
           popup.__copyToggleTitleNode = titleNode;
           popup.__copyToggleHandler = handlePopupCopyToggle;
+          popup.__copyToggleKeyDownHandler = handlePopupCopyToggleKeyDown;
 
           extraDidOpen?.(popup);
         },
         willClose: (popup) => {
           popup.__copyToggleTitleNode?.removeEventListener("click", popup.__copyToggleHandler);
+          popup.__copyToggleTitleNode?.removeEventListener("keydown", popup.__copyToggleKeyDownHandler);
+
+          if (activePopupRef.current.popup === popup) {
+            activePopupRef.current = { popup: null, titleCopy: null };
+          }
+
           extraWillClose?.(popup);
         },
         ...restExtraOptions,
       };
     },
-    [isChineseCopyEnabled],
+    [syncPopupCopy, toggleCopyLanguage],
   );
 
   useEffect(() => {
@@ -599,18 +652,20 @@ export default function Page() {
                 <div
                   className="story-copy story-copy--success text-center md:text-left"
                   data-copy-locale={isChineseCopyEnabled ? "zh" : "en"}
-                  data-copy-reveal="true"
                 >
-                  <div className="story-pill story-pill--success inline-flex rounded-full uppercase shadow-sm">
+                  <div
+                    className="story-pill story-pill--success inline-flex rounded-full uppercase shadow-sm"
+                    data-copy-reveal="true"
+                  >
                     {localizedEyebrow}
                   </div>
-                  <h1 className="type-display display-title display-title--success">
+                  <h1 className="type-display display-title display-title--success" data-copy-reveal="true">
                     {localizedSuccessTitle}
                   </h1>
-                  <p className="type-body success-subtitle max-w-2xl">
+                  <p className="type-body success-subtitle max-w-2xl" data-copy-reveal="true">
                     {localizedSuccessSubtitle}
                   </p>
-                  <p className="type-body body-copy body-copy--soft success-promise max-w-2xl">
+                  <p className="type-body body-copy body-copy--soft success-promise max-w-2xl" data-copy-reveal="true">
                     {localizedPromise}
                   </p>
 
