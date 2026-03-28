@@ -557,12 +557,7 @@ export default function Page() {
         padding: popupConfig.padding,
         color: popupConfig.color,
         background: `#fff url(${popupConfig.backgroundImage})`,
-        backdrop: `
-          ${popupConfig.backdropColor}
-          url(${popupConfig.backdropImage})
-          center right
-          no-repeat
-        `,
+        backdrop: popupConfig.backdropColor,
         confirmButtonText: getLocalizedCopy(dialogues.confirmButtonText, popupLanguageRef.current),
         buttonsStyling: false,
         customClass: {
@@ -572,6 +567,7 @@ export default function Page() {
         },
         didOpen: (popup) => {
           const titleNode = popup.querySelector(".sweet-dialog__title");
+          let stickerNode = null;
 
           const handlePopupCopyToggle = (event) => {
             event?.stopPropagation?.();
@@ -590,17 +586,28 @@ export default function Page() {
             titleNode.addEventListener("keydown", handlePopupCopyToggleKeyDown);
           }
 
+          if (popupConfig.backdropImage) {
+            stickerNode = document.createElement("img");
+            stickerNode.className = "sweet-dialog__sticker";
+            stickerNode.src = popupConfig.backdropImage;
+            stickerNode.alt = "";
+            stickerNode.setAttribute("aria-hidden", "true");
+            popup.appendChild(stickerNode);
+          }
+
           activePopupRef.current = { popup, titleCopy };
           syncPopupCopy(popup, titleCopy);
           popup.__copyToggleTitleNode = titleNode;
           popup.__copyToggleHandler = handlePopupCopyToggle;
           popup.__copyToggleKeyDownHandler = handlePopupCopyToggleKeyDown;
+          popup.__stickerNode = stickerNode;
 
           extraDidOpen?.(popup);
         },
         willClose: (popup) => {
           popup.__copyToggleTitleNode?.removeEventListener("click", popup.__copyToggleHandler);
           popup.__copyToggleTitleNode?.removeEventListener("keydown", popup.__copyToggleKeyDownHandler);
+          popup.__stickerNode?.remove();
 
           if (activePopupRef.current.popup === popup) {
             activePopupRef.current = { popup: null, titleCopy: null };
@@ -845,8 +852,9 @@ export default function Page() {
         )}
 
         <button
-          className="mute-toggle fixed bottom-8 right-8 z-30 rounded-full p-3 transition"
+          className="mute-toggle"
           onClick={toggleMute}
+          aria-label={isMuted ? "Unmute music" : "Mute music"}
         >
           {isMuted ? <BsVolumeMuteFill size={24} /> : <BsVolumeUpFill size={24} />}
         </button>
