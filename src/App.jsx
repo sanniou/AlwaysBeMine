@@ -212,6 +212,7 @@ export default function Page() {
   const burstTimeoutsRef = useRef({ yes: null, no: null });
   const posterQueueRef = useRef([]);
   const shouldShowPosterInterludeRef = useRef(false);
+  const posterPreloadStartedRef = useRef(false);
   const popupLanguageRef = useRef(isChineseCopyEnabled);
   const activePopupRef = useRef({ popup: null, titleCopy: null });
   popupLanguageRef.current = isChineseCopyEnabled;
@@ -374,6 +375,62 @@ export default function Page() {
       gifRef.current.src = media.yesGifs[currentGifIndex];
     }
   }, [yesPressed, currentGifIndex, isSuccessUnlocked]);
+
+  useEffect(() => {
+    const posters = media.posters ?? [];
+
+    if (!successPopupConfirmed || posterPreloadStartedRef.current || posters.length === 0 || typeof window === "undefined") {
+      return undefined;
+    }
+
+    posterPreloadStartedRef.current = true;
+
+    let isCancelled = false;
+    let preloadTimerId = null;
+    const preloadedImages = [];
+
+    const preloadPosterAtIndex = (index) => {
+      if (isCancelled || index >= posters.length) {
+        return;
+      }
+
+      const poster = posters[index];
+      const image = new Image();
+      image.decoding = "async";
+      image.src = poster.src;
+
+      const scheduleNext = () => {
+        if (isCancelled) {
+          return;
+        }
+
+        preloadTimerId = window.setTimeout(() => {
+          preloadPosterAtIndex(index + 1);
+        }, 140);
+      };
+
+      image.onload = scheduleNext;
+      image.onerror = scheduleNext;
+      preloadedImages.push(image);
+    };
+
+    preloadTimerId = window.setTimeout(() => {
+      preloadPosterAtIndex(0);
+    }, 480);
+
+    return () => {
+      isCancelled = true;
+
+      if (preloadTimerId) {
+        window.clearTimeout(preloadTimerId);
+      }
+
+      preloadedImages.forEach((image) => {
+        image.onload = null;
+        image.onerror = null;
+      });
+    };
+  }, [successPopupConfirmed]);
 
   useEffect(() => {
     if (yesPressed && isSuccessUnlocked) {
