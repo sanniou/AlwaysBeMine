@@ -13,10 +13,17 @@ const splitSentence = (sentence) => {
 };
 
 const getEntryDuration = (entry) => {
-  const contentLength = `${entry.english}${entry.chinese}`.replace(/\s+/g, "").length;
+  const englishLength = entry.english.replace(/\s+/g, "").length;
+  const chineseLength = entry.chinese.replace(/\s+/g, "").length;
   const baseDuration = marquee.baseIntervalMs ?? marquee.intervalMs ?? 9000;
   const maxDuration = marquee.maxIntervalMs ?? 14000;
-  return Math.min(maxDuration, Math.max(baseDuration, baseDuration + contentLength * 38));
+  const englishCharMs = marquee.englishCharMs ?? 22;
+  const chineseCharMs = marquee.chineseCharMs ?? 12;
+
+  return Math.min(
+    maxDuration,
+    Math.max(baseDuration, baseDuration + englishLength * englishCharMs + chineseLength * chineseCharMs),
+  );
 };
 
 const MarqueeProposal = ({ isActive = true, onPosterTrigger }) => {

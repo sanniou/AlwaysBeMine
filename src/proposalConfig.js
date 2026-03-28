@@ -296,11 +296,13 @@ export const proposalConfig = {
     floatingGifRandomDurationRangeSec: 1.6,
   },
   marquee: {
-    intervalMs: 9000,
-    baseIntervalMs: 7800,
-    maxIntervalMs: 13200,
-    translationDelayMs: 320,
-    animationDurationSec: 18,
+    intervalMs: 7600,
+    baseIntervalMs: 5600,
+    maxIntervalMs: 9800,
+    translationDelayMs: 210,
+    animationDurationSec: 14,
+    englishCharMs: 20,
+    chineseCharMs: 10,
   },
   preloader: {
     durationMs: 2800,
