@@ -14,10 +14,7 @@ const splitSentence = (sentence) => {
 
 const MarqueeProposal = ({ isActive = true }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const entries = useMemo(
-    () => dialogues.marqueeSentences.map(splitSentence),
-    []
-  );
+  const entries = useMemo(() => dialogues.marqueeSentences.map(splitSentence), []);
   const currentEntry = entries[currentIndex];
 
   useEffect(() => {
@@ -34,7 +31,7 @@ const MarqueeProposal = ({ isActive = true }) => {
 
   return (
     <div className="marquee-shell">
-      <div className={`marquee-card ${isActive ? "marquee-card--active" : ""}`}>
+      <div className={`marquee-card ${isActive ? "marquee-card--active" : ""}`} key={currentIndex}>
         <p className="marquee-card__english">{currentEntry.english}</p>
         {currentEntry.chinese ? <p className="marquee-card__chinese">{currentEntry.chinese}</p> : null}
       </div>

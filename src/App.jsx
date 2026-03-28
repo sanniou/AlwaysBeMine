@@ -288,34 +288,34 @@ export default function Page() {
 
         {yesPressed && isSuccessUnlocked ? (
           <div className="relative z-20 flex min-h-screen items-center justify-center px-4 py-8 md:px-8">
-            <div className="success-shell w-full max-w-6xl rounded-[2rem] border border-white/45 bg-white/12 p-5 shadow-[0_24px_80px_rgba(50,10,70,0.25)] backdrop-blur-2xl md:p-8">
+            <div className="success-shell w-full max-w-6xl rounded-[2rem] border border-white/45 bg-[rgba(44,20,58,0.58)] p-5 shadow-[0_24px_80px_rgba(28,8,43,0.34)] backdrop-blur-2xl md:p-8">
               <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,420px)_1fr]">
                 <div className="relative flex justify-center">
                   <div className="success-glow" />
                   <img
                     ref={gifRef}
-                    className="relative z-10 h-[240px] w-auto rounded-[1.75rem] border border-white/60 object-cover shadow-[0_24px_60px_rgba(100,20,120,0.35)] md:h-[320px]"
+                    className="relative z-10 h-[240px] w-auto rounded-[1.75rem] border border-white/30 object-cover shadow-[0_24px_60px_rgba(24,10,38,0.45)] md:h-[320px]"
                     src={media.yesGifs[currentGifIndex]}
                     alt="Yes Response"
                   />
                 </div>
 
                 <div className="text-center lg:text-left">
-                  <div className="mb-3 inline-flex rounded-full border border-white/60 bg-white/35 px-4 py-2 text-xs tracking-[0.25em] text-rose-700 shadow-sm uppercase">
+                  <div className="mb-3 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs tracking-[0.25em] text-rose-100 shadow-sm uppercase">
                     {profile.eyebrow}
                   </div>
-                  <h1 className="text-4xl md:text-6xl font-bold leading-tight text-white drop-shadow-[0_12px_30px_rgba(96,24,114,0.35)]">
+                  <h1 className="text-4xl md:text-6xl font-bold leading-tight text-white drop-shadow-[0_12px_30px_rgba(12,5,22,0.55)]">
                     {titles.success}
                   </h1>
-                  <p className="mt-3 text-lg md:text-2xl text-white/90 font-medium leading-relaxed">
+                  <p className="mt-4 max-w-2xl text-lg md:text-2xl text-rose-50 font-medium leading-relaxed drop-shadow-[0_8px_24px_rgba(12,5,22,0.42)]">
                     {titles.successSubtitle}
                   </p>
-                  <p className="mt-5 max-w-2xl text-sm md:text-base text-white/75 leading-7">
+                  <p className="mt-5 max-w-2xl text-sm md:text-base text-white/72 leading-7">
                     {profile.promise}
                   </p>
 
-                  <div className="mt-8 rounded-[1.5rem] border border-white/50 bg-white/16 px-4 py-4 shadow-[0_18px_45px_rgba(86,20,105,0.18)] md:px-6">
-                    <p className="mb-3 text-xs uppercase tracking-[0.28em] text-white/70">
+                  <div className="mt-8 rounded-[1.5rem] border border-white/12 bg-[linear-gradient(145deg,rgba(16,8,22,0.68),rgba(42,22,54,0.52))] px-4 py-4 shadow-[0_18px_45px_rgba(10,5,18,0.34)] md:px-6">
+                    <p className="mb-3 text-xs uppercase tracking-[0.28em] text-white/55">
                       {dialogues.successCaption}
                     </p>
                     <WordMareque isActive={successPopupConfirmed} />
