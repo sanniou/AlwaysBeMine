@@ -40,6 +40,63 @@ import nomusic5 from "./assets/AudioTracks/Reject1_TooGood.mp3";
 
 const localized = (en, zh) => ({ en, zh });
 
+const createPosterInterlude = () => {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1700">
+      <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#fff7fb" />
+          <stop offset="48%" stop-color="#f6e8f4" />
+          <stop offset="100%" stop-color="#ffeede" />
+        </linearGradient>
+        <radialGradient id="bloom" cx="50%" cy="30%" r="60%">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.92)" />
+          <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+        </radialGradient>
+      </defs>
+      <rect width="1200" height="1700" fill="url(#bg)" rx="52" />
+      <circle cx="310" cy="320" r="220" fill="#ffd7ea" opacity="0.5" />
+      <circle cx="930" cy="440" r="250" fill="#ffe2d4" opacity="0.42" />
+      <circle cx="690" cy="1350" r="320" fill="#f0dbf4" opacity="0.38" />
+      <rect x="92" y="92" width="1016" height="1516" rx="42" fill="url(#bloom)" opacity="0.72" />
+      <text x="600" y="460" text-anchor="middle" font-family="Georgia, serif" font-size="50" fill="#a26b82" letter-spacing="16">
+        IN BETWEEN HEARTBEATS
+      </text>
+      <text x="600" y="770" text-anchor="middle" font-family="'Times New Roman', Georgia, serif" font-size="164" fill="#6b4458">
+        You
+      </text>
+      <text x="600" y="930" text-anchor="middle" font-family="'Times New Roman', Georgia, serif" font-size="102" fill="#d58baa">
+        &amp;
+      </text>
+      <text x="600" y="1110" text-anchor="middle" font-family="'Times New Roman', Georgia, serif" font-size="164" fill="#6b4458">
+        Me
+      </text>
+      <text x="600" y="1316" text-anchor="middle" font-family="Georgia, serif" font-size="42" fill="#9e7185" letter-spacing="10">
+        a quiet little interlude before the next reveal
+      </text>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+};
+
+const posterModules = import.meta.glob("./assets/poster/*.{png,jpg,jpeg,webp,avif,gif,svg}", {
+  eager: true,
+  import: "default",
+});
+
+const posterAssets = Object.entries(posterModules)
+  .sort(([pathA], [pathB]) => pathA.localeCompare(pathB, undefined, { sensitivity: "base", numeric: true }))
+  .map(([path, src], index) => {
+    const filename = path.split("/").pop() ?? `poster-${index + 1}`;
+
+    return {
+      id: `poster-${String(index + 1).padStart(2, "0")}`,
+      src,
+      alt: filename.replace(/\.[^.]+$/, ""),
+    };
+  });
+
 export const proposalConfig = {
   profile: {
     badge: localized("A tiny page made with a brave heart", "藏着万分勇气的一纸心意"),
@@ -223,6 +280,12 @@ export const proposalConfig = {
     hoverHeartGif: heartGif,
     hoverSadGif: sadGif,
     successGifSwitchIntervalMs: 5000,
+    posters: posterAssets,
+    posterInterlude: {
+      id: "poster-interlude",
+      src: createPosterInterlude(),
+      alt: "You and Me interlude",
+    },
   },
   ui: {
     yesButtonBaseSize: 16,

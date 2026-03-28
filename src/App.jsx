@@ -194,9 +194,13 @@ export default function Page() {
   const [yesHeartbeatVersion, setYesHeartbeatVersion] = useState(0);
   const [yesBurstParticles, setYesBurstParticles] = useState([]);
   const [noBurstParticles, setNoBurstParticles] = useState([]);
+  const [selectedPoster, setSelectedPoster] = useState(null);
+  const [selectedPosterOrientation, setSelectedPosterOrientation] = useState("portrait");
 
   const gifRef = useRef(null);
   const burstTimeoutsRef = useRef({ yes: null, no: null });
+  const posterQueueRef = useRef([]);
+  const shouldShowPosterInterludeRef = useRef(false);
   const yesButtonMorph = getYesButtonMorph(noCount);
   const yesButtonStyle = {
     "--yes-inline-size": yesButtonMorph.inlineSize,
@@ -251,6 +255,65 @@ export default function Page() {
         setNoBurstParticles([]);
       }
     }, 1100);
+  }, []);
+
+  const openRandomPoster = useCallback(() => {
+    const posters = media.posters ?? [];
+    const posterInterlude = media.posterInterlude ?? null;
+
+    if (posters.length === 0) {
+      if (posterInterlude) {
+        setSelectedPosterOrientation("portrait");
+        setSelectedPoster(posterInterlude);
+      }
+      return;
+    }
+
+    if (shouldShowPosterInterludeRef.current && posterInterlude) {
+      shouldShowPosterInterludeRef.current = false;
+      posterQueueRef.current = [];
+      setSelectedPosterOrientation("portrait");
+      setSelectedPoster(posterInterlude);
+      return;
+    }
+
+    if (posterQueueRef.current.length === 0) {
+      posterQueueRef.current = posters
+        .map((_, index) => index)
+        .sort(() => Math.random() - 0.5);
+    }
+
+    const nextPosterIndex = posterQueueRef.current.pop();
+    const nextPoster = typeof nextPosterIndex === "number" ? posters[nextPosterIndex] : posters[0];
+
+    if (posterQueueRef.current.length === 0) {
+      shouldShowPosterInterludeRef.current = true;
+    }
+
+    setSelectedPosterOrientation("portrait");
+    setSelectedPoster(nextPoster);
+  }, []);
+
+  const closePoster = useCallback(() => {
+    setSelectedPoster(null);
+  }, []);
+
+  const handlePosterImageLoad = useCallback((event) => {
+    const { naturalWidth, naturalHeight } = event.currentTarget;
+
+    if (!naturalWidth || !naturalHeight) {
+      return;
+    }
+
+    const aspectRatio = naturalWidth / naturalHeight;
+
+    if (aspectRatio > 1.08) {
+      setSelectedPosterOrientation("landscape");
+    } else if (aspectRatio < 0.92) {
+      setSelectedPosterOrientation("portrait");
+    } else {
+      setSelectedPosterOrientation("square");
+    }
   }, []);
 
   useEffect(() => {
@@ -483,6 +546,29 @@ export default function Page() {
       </div>
       <div className={`romance-overlay fixed inset-0 -z-10 ${isRevealed ? "romance-overlay--success" : "romance-overlay--intro"}`} />
 
+      {selectedPoster ? (
+        <div
+          className="poster-lightbox fixed inset-0 z-40 grid place-items-center p-4 md:p-8"
+          onClick={closePoster}
+          role="dialog"
+          aria-modal="true"
+          aria-label={selectedPoster.alt}
+        >
+          <div className="poster-lightbox__veil absolute inset-0" />
+          <img
+            key={selectedPoster.id}
+            className={`poster-lightbox__image poster-lightbox__image--${selectedPosterOrientation} relative z-10`}
+            src={selectedPoster.src}
+            alt={selectedPoster.alt}
+            onLoad={handlePosterImageLoad}
+            onClick={(event) => {
+              event.stopPropagation();
+              closePoster();
+            }}
+          />
+        </div>
+      ) : null}
+
       {canShowMouseStealer && <MouseStealing />}
 
       <div
@@ -532,7 +618,7 @@ export default function Page() {
                     <p className="type-display success-caption-line text-center md:text-left" data-copy-reveal="true">
                       {localizedSuccessCaption}
                     </p>
-                    <WordMareque isActive={successPopupConfirmed} />
+                    <WordMareque isActive={successPopupConfirmed} onPosterTrigger={openRandomPoster} />
                   </div>
                 </div>
               </div>

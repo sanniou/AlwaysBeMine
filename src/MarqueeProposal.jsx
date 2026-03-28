@@ -19,12 +19,25 @@ const getEntryDuration = (entry) => {
   return Math.min(maxDuration, Math.max(baseDuration, baseDuration + contentLength * 38));
 };
 
-const MarqueeProposal = ({ isActive = true }) => {
+const MarqueeProposal = ({ isActive = true, onPosterTrigger }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showChinese, setShowChinese] = useState(false);
   const entries = useMemo(() => dialogues.marqueeSentences.map(splitSentence), []);
   const currentEntry = entries[currentIndex];
   const currentDuration = getEntryDuration(currentEntry);
+
+  const handlePosterTrigger = (event) => {
+    event.stopPropagation();
+    onPosterTrigger?.();
+  };
+
+  const handlePosterKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation();
+      onPosterTrigger?.();
+    }
+  };
 
   useEffect(() => {
     if (!isActive) {
@@ -49,7 +62,14 @@ const MarqueeProposal = ({ isActive = true }) => {
 
   return (
     <div className="marquee-shell">
-      <div className={`marquee-card ${isActive ? "marquee-card--active" : ""}`}>
+      <div
+        className={`marquee-card ${isActive ? "marquee-card--active" : ""} ${onPosterTrigger ? "marquee-card--poster-trigger" : ""}`}
+        role={onPosterTrigger ? "button" : undefined}
+        tabIndex={onPosterTrigger ? 0 : undefined}
+        onClick={onPosterTrigger ? handlePosterTrigger : undefined}
+        onKeyDown={onPosterTrigger ? handlePosterKeyDown : undefined}
+        aria-label={onPosterTrigger ? "Open poster" : undefined}
+      >
         <div className="marquee-card__content" key={currentIndex}>
           <span className="marquee-card__quote-mark">“</span>
           <p className="marquee-card__english">{currentEntry.english}</p>
@@ -69,6 +89,7 @@ const MarqueeProposal = ({ isActive = true }) => {
 
 MarqueeProposal.propTypes = {
   isActive: PropTypes.bool,
+  onPosterTrigger: PropTypes.func,
 };
 
 export default MarqueeProposal;
