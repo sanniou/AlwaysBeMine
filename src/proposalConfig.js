@@ -42,36 +42,35 @@ const localized = (en, zh) => ({ en, zh });
 
 export const proposalConfig = {
   profile: {
-    badge: localized("A tiny page made with a brave heart", "一页藏着勇气的小小心意"),
+    badge: localized("A tiny page made with a brave heart", "藏着万分勇气的一纸心意"),
     eyebrow: localized(
       "For the one I would choose again and again",
-      "献给那个我愿意一次又一次选择的人",
+      "致那个我愿无数次坚定走向的你",
     ),
     promise: localized(
       "No matter how playful I sound, this page is my way of saying I’m serious about you.",
-      "不管我听起来多么俏皮，这一页其实是在认真地告诉你：我对你是认真的。",
+      "哪怕此刻的互动带着几分俏皮，但我其实想借这一页无比认真地告诉你：我认定你了。",
     ),
     supportLine: localized(
       "Take your time, smile first, and then tell me what your heart says.",
-      "慢慢来，先笑一下，再把你的心意告诉我。",
+      "别着急，先扬起嘴角，再听听你心里的声音吧。",
     ),
   },
   titles: {
     main: localized(
       "Will you let me be your favorite hello and your safest place?",
-      "你愿意让我成为你最想见的那句问候，和你最安心的归处吗？",
+      "你愿意让我成为你最欢喜的初见，和最安心的归处吗？",
     ),
-    success: localized("You make my whole world softer.", "你让我的整个世界都柔软了下来。"),
+    success: localized("You make my whole world softer.", "因为你，我的整个世界都变得柔软。"),
     successSubtitle: localized(
       "From this moment on, every little thing feels brighter with you in it.",
-      "从这一刻起，因为有你在，所有细微的事物都变得更明亮了。",
+      "从这一刻起，万物皆因你的存在而熠熠生辉。",
     ),
   },
   buttons: {
-    yesLabel: localized("Yes, come closer", "愿意，靠近一点"),
+    yesLabel: localized("Yes, come closer", "我愿意"),
     noInitialLabel: localized("Not yet", "再等等"),
-    noPhrases: localized(
-      [
+    noPhrases: localized([
         "Not yet",
         "Really going to make me wait?",
         "You are adorably difficult.",
@@ -97,33 +96,32 @@ export const proposalConfig = {
         "My heart already picked you.",
         "I’m still right here, choosing you.",
         "Last playful protest before I ask again. 💘",
-      ],
-      [
-        "再等等",
-        "真的要让我继续等吗？",
-        "你这样嘴硬真的很可爱。",
-        "我可以耐心，但你也太会吊人胃口了。",
-        "至少先笑一下再拒绝我嘛。",
-        "你知道我为这一刻排练了很久吧？",
-        "我把最柔软的心都带来了。",
-        "要不给我一个小小的机会？",
-        "你是不是有点享受逗我呀？",
-        "我才不信这是你的最终答案。",
-        "我的勇气还稳稳站在这里。",
-        "你再这样可爱下去，我只会更想继续追。",
-        "别让这张期待的脸白白浪费呀。",
-        "我还在等你最温柔的那句愿意。",
-        "我的心又开始演偶像剧了。",
-        "好吧，这一下有一点点疼。",
-        "我还能争取一次重新考虑吗？",
-        "我保证答应之后我会更甜。",
-        "这份悬念都快成传奇了。",
-        "连命运都替我们脸红了。",
-        "连星星都觉得你该点头。",
-        "来嘛，让我把偏爱都给你。",
-        "我的心其实早就选了你。",
-        "我还在这里，认真地选你。",
-        "最后一轮撒娇抗议，然后我再问一次。💘",
+      ],[
+        "先不要",
+        "真的忍心让我继续等吗？",
+        "连拒绝的样子都这么可爱。",
+        "我很有耐心，但你真的很会折磨人呀。",
+        "点‘不要’之前，至少先对我笑一个嘛。",
+        "我可是对着镜子排练了很久的！",
+        "我可是带着一整颗滚烫的心来的。",
+        "就给我一丁点儿机会，好不好？",
+        "你其实很享受逗我玩的对吧？",
+        "我不信，这肯定不是你的最终答案。",
+        "没关系，我的勇气还在原地罚站。",
+        "你越调皮，我就越舍不得放弃。",
+        "看在我这么真诚的份上，心疼我一下吧~",
+        "我还在满心欢喜地等你点头呢。",
+        "我的心率已经飙升到爆表了！",
+        "嘶……这一下点得我有点心痛。",
+        "看我这么坚持，能换一次重新考虑吗？",
+        "我发誓，答应我之后一定会超甜的！",
+        "你这拉扯的段位，简直是教科书级别。",
+        "再点下去，连月老都要急得跺脚了。",
+        "今晚的星星都在劝你答应我。",
+        "乖啦，让我往后余生都偏向你。",
+        "其实我的心底，早就写满了你的名字。",
+        "而此刻，我依然站在这里，坚定地走向你。",
+        "好啦不闹了，准备好迎接我最认真的心意了吗？💘",
       ],
     ),
   },
@@ -131,7 +129,7 @@ export const proposalConfig = {
     earlyYesPopup: {
       title: localized(
         "That was such a lovely yes that I almost forgot to breathe. Stay with me for one more heartbeat — I want to make this moment feel even more special. 💞",
-        "这一声“愿意”好听得让我差点忘了呼吸。再陪我多停留一个心跳的时间吧，我想让这一刻更特别一些。💞",
+        "你的这句“愿意”太迷人，让我瞬间屏住了呼吸。再陪我停留一个心跳的瞬间吧，我想让这一刻成为我们专属的永恒。💞",
       ),
       width: "min(680px, calc(100vw - 2rem))",
       padding: "clamp(1.25em, 4vw, 2em)",
@@ -148,7 +146,7 @@ export const proposalConfig = {
     successPopup: {
       title: localized(
         "I’m keeping this answer close to my heart. From here on, let every song, every glow, and every word remind you that you are deeply, gently, and intentionally loved. ✨",
-        "我会把这个答案贴近心口珍藏。从现在起，愿每一首歌、每一道光、每一句话，都提醒你：你正被认真、温柔而坚定地爱着。✨",
+        "我会把这个答案紧紧捂在心口珍藏。从今往后，愿晨风与落日、繁星与微光都在替我诉说：你正被深深地、温柔地、笃定地爱着。✨",
       ),
       width: "min(820px, calc(100vw - 2rem))",
       padding: "clamp(1.3em, 4vw, 2.2em)",
@@ -160,7 +158,7 @@ export const proposalConfig = {
     finalNoPopup: {
       title: localized(
         "If your answer still needs time, I’ll keep showing up with tenderness. Some feelings are worth protecting, and mine for you is one of them. 🌙💗",
-        "如果你的答案还需要一点时间，我也会继续温柔地靠近。有些感情值得被好好守护，而我对你的喜欢正是其中之一。🌙💗",
+        "如果你的心还需要时间安放，那我会在此温柔地守望。世间有些情意值得倾尽时光去护佑，而我对你的心动，恰逢其一。🌙💗",
       ),
       width: "min(820px, calc(100vw - 2rem))",
       padding: "clamp(1.25em, 4vw, 2em)",
@@ -169,12 +167,12 @@ export const proposalConfig = {
       backdropImage: nogif1,
       backdropColor: "rgba(40, 26, 78, 0.72)",
     },
-    confirmButtonText: localized("Okay", "好"),
+    confirmButtonText: localized("Okay", "好啦"),
     successCaption: localized(
       "A little ribbon of words for the feeling you woke up in me",
-      "献给你，也献给你唤醒我心意的这一串字句",
+      "字句如丝带，系满你唤醒我心底所有的温柔",
     ),
-    marqueeSentences: [
+    marqueeSentences:[
       "I only wish us never to be parted./我此生唯一的愿望，就是我们永远都不再分开。",
       "Whatever our souls are made of, yours and mine are the same./不论我们的灵魂是由什么铸就的，你和我的灵魂同出一辙。",
       "You are the most winning thing that ever brought sunshine into my desolate life./你是这世上最迷人的存在，为我原本荒凉的人生，带来了唯一的阳光。",
@@ -191,13 +189,13 @@ export const proposalConfig = {
     ],
   },
   labels: {
-    promiseCard: localized("Little promise", "小小的承诺"),
-    braveryCard: localized("Progress of bravery", "勇气进度"),
+    promiseCard: localized("Little promise", "专属承诺"),
+    braveryCard: localized("Progress of bravery", "勇气蓄力中"),
     successReady: localized(
       "The page is ready for your yes — I’m just waiting for your final click.",
-      "这一页已经准备好迎接你的愿意了，我只等你最后按下那一下。",
+      "满屏的心动已就绪，只待你最后的点头。",
     ),
-    gatheringCourage: localized("I am still gathering courage...", "我还在鼓起勇气..."),
+    gatheringCourage: localized("I am still gathering courage...", "正在为你收集所有的勇气..."),
   },
   thresholds: {
     successAfterNoCount: 2,
@@ -208,8 +206,8 @@ export const proposalConfig = {
     earlyYesAutoSkipDelayMs: 2000,
   },
   audio: {
-    yesTracks: [yesmusic1, yesmusic3, yesmusic4, yesmusic2],
-    noTracks: [nomusic1, nomusic2, nomusic3, nomusic4, nomusic5],
+    yesTracks:[yesmusic1, yesmusic3, yesmusic4, yesmusic2],
+    noTracks:[nomusic1, nomusic2, nomusic3, nomusic4, nomusic5],
     startYesTrackIndex: 0,
     noMusicFirstTriggerCount: 1,
     noMusicSwitchEvery: 7,
@@ -220,8 +218,8 @@ export const proposalConfig = {
     splineSceneUrl: "https://prod.spline.design/oSxVDduGPlsuUIvT/scene.splinecode",
     loveSvg: lovesvg,
     initialGif: Lovegif,
-    yesGifs: [yesgif0, yesgif4, yesgif5, yesgif6, yesgif7, yesgif8, yesgif9, yesgif10, yesgif11],
-    noGifs: [nogif0, nogif0_1, nogif1, nogif2, nogif3, nogif4, nogif5, nogif6, nogif7, nogif8],
+    yesGifs:[yesgif0, yesgif4, yesgif5, yesgif6, yesgif7, yesgif8, yesgif9, yesgif10, yesgif11],
+    noGifs:[nogif0, nogif0_1, nogif1, nogif2, nogif3, nogif4, nogif5, nogif6, nogif7, nogif8],
     hoverHeartGif: heartGif,
     hoverSadGif: sadGif,
     successGifSwitchIntervalMs: 5000,
