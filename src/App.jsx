@@ -19,7 +19,105 @@ const {
   ui,
 } = proposalConfig;
 
-const MAX_YES_BUTTON_FONT_SIZE = 72;
+const YES_BUTTON_MORPH_STAGES = [
+  {
+    inlineSize: "clamp(11.25rem, 44vw, 13rem)",
+    scale: "1",
+    labelSize: "clamp(1.02rem, 1.25vw, 1.14rem)",
+    shadowOpacity: "0.24",
+    haloOpacity: "0.28",
+    ringOpacity: "0",
+    ringSize: "0px",
+    highlightOpacity: "0.18",
+  },
+  {
+    inlineSize: "clamp(11.9rem, 47vw, 13.8rem)",
+    scale: "1.012",
+    labelSize: "clamp(1.04rem, 1.3vw, 1.16rem)",
+    shadowOpacity: "0.27",
+    haloOpacity: "0.32",
+    ringOpacity: "0.08",
+    ringSize: "8px",
+    highlightOpacity: "0.2",
+  },
+  {
+    inlineSize: "clamp(12.6rem, 50vw, 14.8rem)",
+    scale: "1.024",
+    labelSize: "clamp(1.06rem, 1.34vw, 1.18rem)",
+    shadowOpacity: "0.3",
+    haloOpacity: "0.36",
+    ringOpacity: "0.11",
+    ringSize: "12px",
+    highlightOpacity: "0.22",
+  },
+  {
+    inlineSize: "clamp(13.3rem, 54vw, 15.9rem)",
+    scale: "1.034",
+    labelSize: "clamp(1.08rem, 1.38vw, 1.22rem)",
+    shadowOpacity: "0.33",
+    haloOpacity: "0.4",
+    ringOpacity: "0.14",
+    ringSize: "14px",
+    highlightOpacity: "0.24",
+  },
+  {
+    inlineSize: "clamp(14.1rem, 60vw, 17.2rem)",
+    scale: "1.042",
+    labelSize: "clamp(1.1rem, 1.42vw, 1.24rem)",
+    shadowOpacity: "0.36",
+    haloOpacity: "0.44",
+    ringOpacity: "0.18",
+    ringSize: "16px",
+    highlightOpacity: "0.28",
+  },
+  {
+    inlineSize: "clamp(15.4rem, 74vw, 21.2rem)",
+    scale: "1.064",
+    labelSize: "clamp(1.14rem, 1.52vw, 1.3rem)",
+    shadowOpacity: "0.44",
+    haloOpacity: "0.54",
+    ringOpacity: "0.26",
+    ringSize: "20px",
+    highlightOpacity: "0.35",
+  },
+  {
+    inlineSize: "clamp(16.2rem, 82vw, 23.8rem)",
+    scale: "1.078",
+    labelSize: "clamp(1.18rem, 1.6vw, 1.36rem)",
+    shadowOpacity: "0.5",
+    haloOpacity: "0.62",
+    ringOpacity: "0.32",
+    ringSize: "24px",
+    highlightOpacity: "0.4",
+  },
+];
+
+const getYesButtonMorph = (noCount) => {
+  let stageIndex = 0;
+
+  if (noCount <= 0) {
+    stageIndex = 0;
+  } else if (noCount === 1) {
+    stageIndex = 1;
+  } else if (noCount === 2) {
+    stageIndex = 2;
+  } else if (noCount <= 4) {
+    stageIndex = 3;
+  } else if (noCount <= 7) {
+    stageIndex = 4;
+  } else if (noCount <= 11) {
+    stageIndex = 5;
+  } else if (noCount > 11) {
+    stageIndex = 6;
+  }
+
+  return {
+    stageIndex,
+    shouldHeartbeat: noCount > 0,
+    shouldBreathe: noCount >= 4,
+    ...YES_BUTTON_MORPH_STAGES[stageIndex],
+  };
+};
 
 const getLocalizedCopy = (copy, isChineseCopyEnabled) => {
   if (copy && typeof copy === "object" && "en" in copy && "zh" in copy) {
@@ -41,11 +139,20 @@ export default function Page() {
   const [earlyYesSkipped, setEarlyYesSkipped] = useState(false);
   const [isChineseCopyEnabled, setIsChineseCopyEnabled] = useState(false);
   const [copyPulseVersion, setCopyPulseVersion] = useState(0);
+  const [yesHeartbeatVersion, setYesHeartbeatVersion] = useState(0);
 
   const gifRef = useRef(null);
-  const rawYesButtonSize = noCount * ui.yesButtonGrowPerNo + ui.yesButtonBaseSize;
-  const yesButtonSize = Math.min(rawYesButtonSize, MAX_YES_BUTTON_FONT_SIZE);
-  const isYesButtonMaxed = rawYesButtonSize > MAX_YES_BUTTON_FONT_SIZE;
+  const yesButtonMorph = getYesButtonMorph(noCount);
+  const yesButtonStyle = {
+    "--yes-inline-size": yesButtonMorph.inlineSize,
+    "--yes-scale": yesButtonMorph.scale,
+    "--yes-label-size": yesButtonMorph.labelSize,
+    "--yes-shadow-opacity": yesButtonMorph.shadowOpacity,
+    "--yes-halo-opacity": yesButtonMorph.haloOpacity,
+    "--yes-ring-opacity": yesButtonMorph.ringOpacity,
+    "--yes-ring-size": yesButtonMorph.ringSize,
+    "--yes-highlight-opacity": yesButtonMorph.highlightOpacity,
+  };
 
   const [floatingGifs, setFloatingGifs] = useState([]);
 
@@ -185,6 +292,7 @@ export default function Page() {
   const handleNoClick = () => {
     const nextCount = noCount + 1;
     setNoCount(nextCount);
+    setYesHeartbeatVersion((previous) => previous + 1);
 
     if (nextCount >= thresholds.noGifStartCount) {
       const nextGifIndex = (nextCount - thresholds.noGifStartCount) % media.noGifs.length;
@@ -354,7 +462,7 @@ export default function Page() {
                   </p>
 
                   <div className="marquee-frame success-marquee rounded-[1.8rem]">
-                    <p className="type-script success-caption-line text-center md:text-left" data-copy-reveal="true">
+                    <p className="type-display success-caption-line text-center md:text-left" data-copy-reveal="true">
                       {localizedSuccessCaption}
                     </p>
                     <WordMareque isActive={successPopupConfirmed} />
@@ -410,19 +518,15 @@ export default function Page() {
 
                   <div className="proposal-actions hero-actions flex flex-wrap justify-center md:justify-start">
                     <button
+                      key={`yes-heartbeat-${yesHeartbeatVersion}`}
                       onMouseEnter={handleMouseEnterYes}
                       onMouseLeave={handleMouseLeave}
-                      className={`proposal-button proposal-button--yes max-w-full rounded-full px-6 py-3 text-center ${isYesButtonMaxed ? "proposal-button--maxed" : ""}`}
-                      style={{
-                        fontSize: yesButtonSize,
-                        lineHeight: 1.1,
-                        maxWidth: "100%",
-                        whiteSpace: isYesButtonMaxed ? "normal" : "nowrap",
-                        width: isYesButtonMaxed ? "min(100%, 24rem)" : "auto",
-                      }}
+                      className={`proposal-button proposal-button--yes rounded-full text-center ${yesButtonMorph.shouldHeartbeat ? "proposal-button--yes-heartbeat" : ""} ${yesButtonMorph.shouldBreathe ? "proposal-button--yes-breathing" : ""}`}
+                      style={yesButtonStyle}
                       onClick={handleYesClick}
                     >
-                      <span className="type-display font-bold tracking-wide">{localizedYesLabel}</span>
+                      <span aria-hidden="true" className="proposal-button__pulse-ring" />
+                      <span className="proposal-button__label type-display font-bold">{localizedYesLabel}</span>
                     </button>
                     <button
                       onMouseEnter={handleMouseEnterNo}
