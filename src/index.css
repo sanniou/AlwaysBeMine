@@ -146,7 +146,7 @@ a {
 }
 
 .romance-bg--success {
-  filter: saturate(0.94) brightness(1.12) blur(0px);
+  filter: saturate(0.88) brightness(1.16) blur(0px);
   transform: scale(1.01);
 }
 
@@ -164,10 +164,11 @@ a {
 
 .romance-overlay--success {
   background:
-    radial-gradient(circle at 24% 16%, rgba(255, 250, 244, 0.55), transparent 28%),
-    radial-gradient(circle at 78% 18%, rgba(255, 214, 226, 0.34), transparent 26%),
-    linear-gradient(180deg, rgba(255, 253, 248, 0.12), rgba(255, 238, 230, 0.28) 35%, rgba(87, 42, 58, 0.35));
-  backdrop-filter: blur(16px);
+    radial-gradient(circle at 22% 18%, rgba(255, 251, 245, 0.78), transparent 30%),
+    radial-gradient(circle at 76% 16%, rgba(255, 225, 215, 0.4), transparent 28%),
+    radial-gradient(circle at 52% 112%, rgba(255, 230, 214, 0.28), transparent 40%),
+    linear-gradient(180deg, rgba(255, 252, 247, 0.28), rgba(255, 236, 225, 0.34) 34%, rgba(126, 70, 88, 0.26));
+  backdrop-filter: blur(18px);
 }
 
 .hero-card,
@@ -211,13 +212,14 @@ a {
 }
 
 .success-shell--revealed {
-  border: 1px solid rgba(255, 244, 233, 0.26);
+  border: 1px solid rgba(255, 246, 236, 0.4);
   background:
-    linear-gradient(148deg, rgba(75, 39, 56, 0.62), rgba(133, 75, 91, 0.24) 40%, rgba(255, 243, 230, 0.12) 100%);
+    linear-gradient(152deg, rgba(111, 63, 81, 0.46), rgba(194, 133, 146, 0.18) 42%, rgba(255, 245, 233, 0.32) 100%),
+    rgba(93, 47, 66, 0.18);
   box-shadow:
-    0 28px 90px rgba(37, 10, 32, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(24px);
+    0 28px 90px rgba(72, 24, 45, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(26px);
 }
 
 .success-shell--revealed::after {
@@ -227,7 +229,7 @@ a {
   width: 22rem;
   height: 22rem;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(255, 225, 197, 0.22) 0%, rgba(255, 225, 197, 0) 74%);
+  background: radial-gradient(circle, rgba(255, 236, 215, 0.36) 0%, rgba(255, 236, 215, 0) 74%);
   pointer-events: none;
 }
 
@@ -245,7 +247,7 @@ a {
 .success-glow {
   width: 320px;
   height: 320px;
-  background: radial-gradient(circle, rgba(255, 224, 205, 0.56) 0%, rgba(229, 154, 176, 0.22) 42%, rgba(255, 255, 255, 0) 72%);
+  background: radial-gradient(circle, rgba(255, 237, 214, 0.68) 0%, rgba(246, 184, 196, 0.26) 42%, rgba(255, 255, 255, 0) 72%);
 }
 
 .hero-emblem {
@@ -294,15 +296,15 @@ a {
 }
 
 .story-pill--intro {
-  background: rgba(255, 255, 255, 0.4);
-  color: rgba(159, 52, 99, 0.88);
-  box-shadow: 0 12px 28px rgba(183, 86, 118, 0.1);
+  background: rgba(255, 255, 255, 0.28);
+  color: rgba(171, 82, 118, 0.74);
+  box-shadow: 0 10px 24px rgba(183, 86, 118, 0.08);
 }
 
 .story-pill--success {
-  background: rgba(255, 247, 240, 0.08);
-  color: rgba(255, 239, 245, 0.88);
-  box-shadow: 0 12px 28px rgba(21, 5, 18, 0.12);
+  background: rgba(255, 249, 243, 0.18);
+  color: rgba(255, 243, 238, 0.82);
+  box-shadow: 0 12px 28px rgba(72, 24, 45, 0.08);
 }
 
 .eyebrow-line {
@@ -311,7 +313,7 @@ a {
   font-size: clamp(0.82rem, 1.45vw, 1rem);
   line-height: 1.3;
   letter-spacing: 0.16em;
-  color: rgba(114, 60, 85, 0.74);
+  color: rgba(128, 74, 97, 0.62);
 }
 
 .display-title {
@@ -321,13 +323,15 @@ a {
 }
 
 .display-title--intro {
-  color: rgba(54, 26, 42, 0.98);
-  text-shadow: 0 14px 40px rgba(255, 255, 255, 0.34);
+  color: rgba(54, 26, 42, 0.99);
+  text-shadow: 0 16px 44px rgba(255, 255, 255, 0.42);
 }
 
 .display-title--success {
-  color: rgba(255, 247, 243, 0.98);
-  text-shadow: 0 14px 36px rgba(21, 7, 19, 0.44);
+  color: rgba(255, 250, 245, 0.99);
+  text-shadow:
+    0 18px 42px rgba(74, 27, 45, 0.24),
+    0 0 32px rgba(255, 240, 228, 0.22);
 }
 
 .script-line {
@@ -339,9 +343,9 @@ a {
 
 .success-subtitle {
   font-size: clamp(1.08rem, 2.35vw, 1.72rem);
-  color: rgba(255, 238, 232, 0.92);
+  color: rgba(255, 243, 236, 0.9);
   line-height: 1.48;
-  text-shadow: 0 8px 24px rgba(14, 6, 14, 0.28);
+  text-shadow: 0 10px 24px rgba(54, 20, 34, 0.18);
 }
 
 .body-copy {
@@ -350,7 +354,7 @@ a {
 }
 
 .body-copy--soft {
-  color: rgba(255, 245, 243, 0.75);
+  color: rgba(255, 245, 240, 0.68);
 }
 
 .proposal-button {
@@ -423,19 +427,21 @@ a {
 
 .marquee-frame {
   padding: clamp(0.95rem, 2.2vw, 1.45rem);
-  border: 1px solid rgba(255, 247, 240, 0.1);
+  border: 1px solid rgba(255, 243, 236, 0.16);
   background:
-    linear-gradient(145deg, rgba(27, 13, 22, 0.54), rgba(63, 31, 45, 0.36)),
-    rgba(20, 8, 18, 0.38);
+    radial-gradient(circle at top right, rgba(255, 244, 236, 0.12), transparent 28%),
+    linear-gradient(150deg, rgba(91, 48, 66, 0.38), rgba(168, 108, 127, 0.14) 58%, rgba(255, 241, 231, 0.12));
   box-shadow:
-    0 18px 45px rgba(10, 5, 18, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    0 18px 42px rgba(70, 25, 44, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .success-caption-line {
-  color: rgba(255, 233, 229, 0.92);
-  font-size: clamp(1.5rem, 3.8vw, 2.45rem);
-  line-height: 1.06;
+  max-width: 28rem;
+  color: rgba(255, 236, 229, 0.82);
+  font-size: clamp(1.42rem, 3.5vw, 2.2rem);
+  line-height: 1.08;
+  text-shadow: 0 8px 22px rgba(54, 20, 34, 0.18);
 }
 
 .hero-actions {
@@ -591,13 +597,13 @@ a {
   min-height: clamp(9rem, 17vw, 10.75rem);
   padding: clamp(1rem, 1.8vw, 1.25rem) clamp(1rem, 2vw, 1.3rem) clamp(0.95rem, 1.8vw, 1.15rem);
   border-radius: clamp(1.25rem, 2.4vw, 1.55rem);
-  border: 1px solid rgba(255, 241, 245, 0.12);
+  border: 1px solid rgba(255, 244, 240, 0.14);
   background:
-    radial-gradient(circle at top right, rgba(255, 221, 231, 0.12), transparent 26%),
-    linear-gradient(165deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+    radial-gradient(circle at top right, rgba(255, 241, 232, 0.16), transparent 28%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.1), rgba(255, 241, 245, 0.04));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 18px 38px rgba(10, 5, 18, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 16px 34px rgba(58, 20, 38, 0.14);
   transition: opacity 0.55s ease, transform 0.55s ease, box-shadow 0.55s ease, border-color 0.55s ease;
 }
 
@@ -605,8 +611,8 @@ a {
   animation: marqueeFloatIn 0.9s ease;
   opacity: 1;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 20px 44px rgba(10, 5, 18, 0.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 18px 38px rgba(58, 20, 38, 0.18);
 }
 
 .marquee-card__content {
@@ -620,7 +626,7 @@ a {
   font-family: var(--font-script);
   font-size: clamp(3.1rem, 5.6vw, 4.4rem);
   line-height: 1;
-  color: rgba(255, 226, 235, 0.3);
+  color: rgba(255, 236, 229, 0.24);
   pointer-events: none;
 }
 
@@ -637,8 +643,8 @@ a {
   font-family: var(--font-display);
   font-size: clamp(0.98rem, 1.55vw, 1.26rem);
   line-height: 1.58;
-  color: rgba(255, 248, 250, 0.98);
-  text-shadow: 0 10px 28px rgba(12, 5, 22, 0.34);
+  color: rgba(255, 247, 244, 0.95);
+  text-shadow: 0 8px 22px rgba(52, 20, 32, 0.18);
   animation: marqueeLineIn 0.82s cubic-bezier(0.23, 1, 0.32, 1) forwards;
 }
 
@@ -649,7 +655,7 @@ a {
   font-family: var(--font-body);
   font-size: clamp(0.9rem, 1.25vw, 1.03rem);
   line-height: 1.68;
-  color: rgba(243, 230, 239, 0.88);
+  color: rgba(248, 236, 239, 0.8);
   transform: translateY(8px);
   opacity: 0;
   filter: blur(4px);
@@ -667,7 +673,7 @@ a {
   width: 100%;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(255, 241, 245, 0.08);
+  background: rgba(255, 241, 245, 0.12);
 }
 
 .marquee-card__progress span {
@@ -675,28 +681,99 @@ a {
   height: 100%;
   width: 100%;
   transform-origin: left center;
-  background: linear-gradient(90deg, rgba(255, 230, 236, 0.18), rgba(255, 214, 227, 0.72), rgba(255, 239, 243, 0.2));
+  background: linear-gradient(90deg, rgba(255, 232, 229, 0.18), rgba(255, 226, 212, 0.64), rgba(255, 240, 241, 0.22));
   animation-name: marqueeProgress;
   animation-timing-function: linear;
   animation-fill-mode: forwards;
 }
 
-.swal2-popup {
-  border-radius: 1.6rem;
-  backdrop-filter: blur(20px);
+.swal2-popup.sweet-dialog {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.8rem;
+  border: 1px solid rgba(255, 249, 242, 0.46);
+  box-shadow:
+    0 26px 70px rgba(88, 33, 56, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+  backdrop-filter: blur(24px);
 }
 
-.swal2-popup .swal2-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.2rem, 4.6vw, 1.9rem);
-  line-height: 1.45;
-  text-wrap: pretty;
+.swal2-popup.sweet-dialog::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.74), rgba(255, 246, 241, 0.28));
+  pointer-events: none;
 }
 
-.swal2-popup .swal2-actions button {
-  font-family: var(--font-body);
+.swal2-popup.sweet-dialog::after {
+  content: "";
+  position: absolute;
+  inset: auto auto -30% 58%;
+  width: 14rem;
+  height: 14rem;
   border-radius: 999px;
-  padding-inline: 1.3rem;
+  background: radial-gradient(circle, rgba(255, 231, 217, 0.34) 0%, rgba(255, 231, 217, 0) 74%);
+  pointer-events: none;
+}
+
+.swal2-popup.sweet-dialog > * {
+  position: relative;
+  z-index: 1;
+}
+
+.swal2-popup.sweet-dialog.sweet-dialog--success::before {
+  background: linear-gradient(150deg, rgba(255, 252, 248, 0.76), rgba(255, 235, 226, 0.36));
+}
+
+.swal2-popup.sweet-dialog.sweet-dialog--final::before {
+  background: linear-gradient(150deg, rgba(255, 250, 252, 0.76), rgba(244, 228, 243, 0.32));
+}
+
+.swal2-popup.sweet-dialog.sweet-dialog--early::before {
+  background: linear-gradient(150deg, rgba(255, 251, 253, 0.78), rgba(255, 234, 241, 0.32));
+}
+
+.swal2-popup .sweet-dialog__title {
+  max-width: 29rem;
+  margin-inline: auto;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 4.6vw, 1.95rem);
+  line-height: 1.42;
+  color: rgba(87, 44, 68, 0.94);
+  text-wrap: pretty;
+  text-shadow: 0 10px 28px rgba(255, 255, 255, 0.42);
+}
+
+.swal2-popup .sweet-dialog__title::after {
+  content: "";
+  display: block;
+  width: 4.5rem;
+  height: 1px;
+  margin: 1rem auto 0;
+  background: linear-gradient(90deg, transparent, rgba(222, 133, 165, 0.75), transparent);
+}
+
+.swal2-popup .swal2-actions .sweet-dialog__confirm {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.9rem 1.5rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: white;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.26), transparent 36%),
+    linear-gradient(105deg, #f17b9e 0%, #ea73a4 44%, #c966b9 100%);
+  box-shadow:
+    0 16px 38px rgba(220, 98, 145, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+}
+
+.swal2-popup .swal2-actions .sweet-dialog__confirm:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 18px 42px rgba(220, 98, 145, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 @keyframes float {

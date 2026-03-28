@@ -231,30 +231,44 @@ export default function Page() {
     return localizedNoPhrases[Math.min(noCount, localizedNoPhrases.length - 1)];
   };
 
+  const buildDialogOptions = useCallback(
+    (popupConfig, title, variant, extraOptions = {}) => ({
+      title,
+      width: popupConfig.width,
+      padding: popupConfig.padding,
+      color: popupConfig.color,
+      background: `#fff url(${popupConfig.backgroundImage})`,
+      backdrop: `
+        ${popupConfig.backdropColor}
+        url(${popupConfig.backdropImage})
+        center right
+        no-repeat
+      `,
+      confirmButtonText: localizedPopupConfirmText,
+      buttonsStyling: false,
+      customClass: {
+        popup: `sweet-dialog sweet-dialog--${variant}`,
+        title: "sweet-dialog__title",
+        confirmButton: "sweet-dialog__confirm",
+      },
+      ...extraOptions,
+    }),
+    [localizedPopupConfirmText],
+  );
+
   useEffect(() => {
     if (yesPressed && !isSuccessUnlocked && !popupShown) {
-      Swal.fire({
-        title: localizedEarlyYesTitle,
-        showClass: {
-          popup: dialogues.earlyYesPopup.showClassPopup,
-        },
-        width: dialogues.earlyYesPopup.width,
-        padding: dialogues.earlyYesPopup.padding,
-        color: dialogues.earlyYesPopup.color,
-        background: `#fff url(${dialogues.earlyYesPopup.backgroundImage})`,
-        backdrop: `
-          ${dialogues.earlyYesPopup.backdropColor}
-          url(${dialogues.earlyYesPopup.backdropImage})
-          center right
-          no-repeat
-        `,
-        confirmButtonText: localizedPopupConfirmText,
-        confirmButtonColor: "#ec4899",
-      });
+      Swal.fire(
+        buildDialogOptions(dialogues.earlyYesPopup, localizedEarlyYesTitle, "early", {
+          showClass: {
+            popup: dialogues.earlyYesPopup.showClassPopup,
+          },
+        }),
+      );
       setPopupShown(true);
       setYesPressed(false);
     }
-  }, [yesPressed, isSuccessUnlocked, popupShown, localizedEarlyYesTitle, localizedPopupConfirmText]);
+  }, [yesPressed, isSuccessUnlocked, popupShown, localizedEarlyYesTitle, buildDialogOptions]);
 
   useEffect(() => {
     if (yesPressed && isSuccessUnlocked && !yespopupShown) {
@@ -262,48 +276,20 @@ export default function Page() {
         playMusic(audio.yesTracks[audio.startYesTrackIndex], audio.yesTracks);
       }
 
-      Swal.fire({
-        title: localizedSuccessPopupTitle,
-        width: dialogues.successPopup.width,
-        padding: dialogues.successPopup.padding,
-        color: dialogues.successPopup.color,
-        background: `#fff url(${dialogues.successPopup.backgroundImage})`,
-        backdrop: `
-          ${dialogues.successPopup.backdropColor}
-          url(${dialogues.successPopup.backdropImage})
-          center right
-          no-repeat
-        `,
-        confirmButtonText: localizedPopupConfirmText,
-        confirmButtonColor: "#ec4899",
-      }).then(() => {
+      Swal.fire(buildDialogOptions(dialogues.successPopup, localizedSuccessPopupTitle, "success")).then(() => {
         setSuccessPopupConfirmed(true);
       });
 
       setYesPopupShown(true);
       setYesPressed(true);
     }
-  }, [yesPressed, isSuccessUnlocked, yespopupShown, localizedSuccessPopupTitle, localizedPopupConfirmText, playMusic]);
+  }, [yesPressed, isSuccessUnlocked, yespopupShown, localizedSuccessPopupTitle, playMusic, buildDialogOptions]);
 
   useEffect(() => {
     if (noCount === thresholds.finalPersuasionCount) {
-      Swal.fire({
-        title: localizedFinalNoTitle,
-        width: dialogues.finalNoPopup.width,
-        padding: dialogues.finalNoPopup.padding,
-        color: dialogues.finalNoPopup.color,
-        background: `#fff url(${dialogues.finalNoPopup.backgroundImage})`,
-        backdrop: `
-          ${dialogues.finalNoPopup.backdropColor}
-          url(${dialogues.finalNoPopup.backdropImage})
-          center right
-          no-repeat
-        `,
-        confirmButtonText: localizedPopupConfirmText,
-        confirmButtonColor: "#ec4899",
-      });
+      Swal.fire(buildDialogOptions(dialogues.finalNoPopup, localizedFinalNoTitle, "final"));
     }
-  }, [noCount, localizedFinalNoTitle, localizedPopupConfirmText]);
+  }, [noCount, localizedFinalNoTitle, buildDialogOptions]);
 
   return (
     <>
