@@ -831,6 +831,18 @@ a {
   color: rgba(87, 44, 68, 0.94);
   text-wrap: pretty;
   text-shadow: 0 10px 28px rgba(255, 255, 255, 0.42);
+  cursor: pointer;
+  transition: color 0.28s ease, text-shadow 0.28s ease, transform 0.28s ease;
+}
+
+.swal2-popup .sweet-dialog__title:hover {
+  color: rgba(111, 58, 86, 0.96);
+  text-shadow: 0 12px 30px rgba(255, 255, 255, 0.5);
+}
+
+.swal2-popup .sweet-dialog__title[data-popup-lang="zh"] {
+  letter-spacing: -0.01em;
+  line-height: 1.5;
 }
 
 .swal2-popup .sweet-dialog__title::after {

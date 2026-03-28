@@ -172,10 +172,6 @@ export default function Page() {
   const localizedYesLabel = getLocalizedCopy(buttons.yesLabel, isChineseCopyEnabled);
   const localizedNoInitialLabel = getLocalizedCopy(buttons.noInitialLabel, isChineseCopyEnabled);
   const localizedNoPhrases = getLocalizedCopy(buttons.noPhrases, isChineseCopyEnabled);
-  const localizedEarlyYesTitle = getLocalizedCopy(dialogues.earlyYesPopup.title, isChineseCopyEnabled);
-  const localizedSuccessPopupTitle = getLocalizedCopy(dialogues.successPopup.title, isChineseCopyEnabled);
-  const localizedFinalNoTitle = getLocalizedCopy(dialogues.finalNoPopup.title, isChineseCopyEnabled);
-  const localizedPopupConfirmText = getLocalizedCopy(dialogues.confirmButtonText, isChineseCopyEnabled);
   const localizedSuccessCaption = getLocalizedCopy(dialogues.successCaption, isChineseCopyEnabled);
   const localizedPromiseCardLabel = getLocalizedCopy(labels.promiseCard, isChineseCopyEnabled);
   const localizedBraveryCardLabel = getLocalizedCopy(labels.braveryCard, isChineseCopyEnabled);
@@ -340,34 +336,77 @@ export default function Page() {
   };
 
   const buildDialogOptions = useCallback(
-    (popupConfig, title, variant, extraOptions = {}) => ({
-      title,
-      width: popupConfig.width,
-      padding: popupConfig.padding,
-      color: popupConfig.color,
-      background: `#fff url(${popupConfig.backgroundImage})`,
-      backdrop: `
-        ${popupConfig.backdropColor}
-        url(${popupConfig.backdropImage})
-        center right
-        no-repeat
-      `,
-      confirmButtonText: localizedPopupConfirmText,
-      buttonsStyling: false,
-      customClass: {
-        popup: `sweet-dialog sweet-dialog--${variant}`,
-        title: "sweet-dialog__title",
-        confirmButton: "sweet-dialog__confirm",
-      },
-      ...extraOptions,
-    }),
-    [localizedPopupConfirmText],
+    (popupConfig, titleCopy, variant, extraOptions = {}) => {
+      const { didOpen: extraDidOpen, willClose: extraWillClose, ...restExtraOptions } = extraOptions;
+
+      return {
+        title: getLocalizedCopy(titleCopy, isChineseCopyEnabled),
+        width: popupConfig.width,
+        padding: popupConfig.padding,
+        color: popupConfig.color,
+        background: `#fff url(${popupConfig.backgroundImage})`,
+        backdrop: `
+          ${popupConfig.backdropColor}
+          url(${popupConfig.backdropImage})
+          center right
+          no-repeat
+        `,
+        confirmButtonText: getLocalizedCopy(dialogues.confirmButtonText, isChineseCopyEnabled),
+        buttonsStyling: false,
+        customClass: {
+          popup: `sweet-dialog sweet-dialog--${variant}`,
+          title: "sweet-dialog__title",
+          confirmButton: "sweet-dialog__confirm",
+        },
+        didOpen: (popup) => {
+          let isPopupChinese = isChineseCopyEnabled;
+          const titleNode = popup.querySelector(".sweet-dialog__title");
+          const confirmButton = popup.querySelector(".sweet-dialog__confirm");
+
+          const syncPopupCopy = () => {
+            if (titleNode) {
+              titleNode.textContent = getLocalizedCopy(titleCopy, isPopupChinese);
+              titleNode.dataset.popupLang = isPopupChinese ? "zh" : "en";
+            }
+
+            if (confirmButton) {
+              confirmButton.textContent = getLocalizedCopy(dialogues.confirmButtonText, isPopupChinese);
+            }
+
+            popup.dataset.popupLang = isPopupChinese ? "zh" : "en";
+          };
+
+          const handlePopupCopyToggle = () => {
+            isPopupChinese = !isPopupChinese;
+            syncPopupCopy();
+          };
+
+          syncPopupCopy();
+
+          if (titleNode) {
+            titleNode.dataset.copyReveal = "true";
+            titleNode.addEventListener("click", handlePopupCopyToggle);
+          }
+
+          popup.__copyToggleTitleNode = titleNode;
+          popup.__copyToggleHandler = handlePopupCopyToggle;
+
+          extraDidOpen?.(popup);
+        },
+        willClose: (popup) => {
+          popup.__copyToggleTitleNode?.removeEventListener("click", popup.__copyToggleHandler);
+          extraWillClose?.(popup);
+        },
+        ...restExtraOptions,
+      };
+    },
+    [isChineseCopyEnabled],
   );
 
   useEffect(() => {
     if (yesPressed && !isSuccessUnlocked && !popupShown) {
       Swal.fire(
-        buildDialogOptions(dialogues.earlyYesPopup, localizedEarlyYesTitle, "early", {
+        buildDialogOptions(dialogues.earlyYesPopup, dialogues.earlyYesPopup.title, "early", {
           showClass: {
             popup: dialogues.earlyYesPopup.showClassPopup,
           },
@@ -376,7 +415,7 @@ export default function Page() {
       setPopupShown(true);
       setYesPressed(false);
     }
-  }, [yesPressed, isSuccessUnlocked, popupShown, localizedEarlyYesTitle, buildDialogOptions]);
+  }, [yesPressed, isSuccessUnlocked, popupShown, buildDialogOptions]);
 
   useEffect(() => {
     if (yesPressed && isSuccessUnlocked && !yespopupShown) {
@@ -384,20 +423,20 @@ export default function Page() {
         playMusic(audio.yesTracks[audio.startYesTrackIndex], audio.yesTracks);
       }
 
-      Swal.fire(buildDialogOptions(dialogues.successPopup, localizedSuccessPopupTitle, "success")).then(() => {
+      Swal.fire(buildDialogOptions(dialogues.successPopup, dialogues.successPopup.title, "success")).then(() => {
         setSuccessPopupConfirmed(true);
       });
 
       setYesPopupShown(true);
       setYesPressed(true);
     }
-  }, [yesPressed, isSuccessUnlocked, yespopupShown, localizedSuccessPopupTitle, playMusic, buildDialogOptions]);
+  }, [yesPressed, isSuccessUnlocked, yespopupShown, playMusic, buildDialogOptions]);
 
   useEffect(() => {
     if (noCount === thresholds.finalPersuasionCount) {
-      Swal.fire(buildDialogOptions(dialogues.finalNoPopup, localizedFinalNoTitle, "final"));
+      Swal.fire(buildDialogOptions(dialogues.finalNoPopup, dialogues.finalNoPopup.title, "final"));
     }
-  }, [noCount, localizedFinalNoTitle, buildDialogOptions]);
+  }, [noCount, buildDialogOptions]);
 
   return (
     <>
