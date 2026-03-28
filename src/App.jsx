@@ -16,6 +16,7 @@ const {
   thresholds,
   audio,
   media,
+  ui,
 } = proposalConfig;
 
 const YES_BUTTON_MORPH_STAGES = [
@@ -190,6 +191,15 @@ const createShuffledIndexQueue = (length) => {
   return queue;
 };
 
+const TOP_GIF_HEARTBEAT_PARTICLES = [
+  { glyph: "♡", left: "18%", top: "64%", x: "-26px", y: "-64px", delay: "0ms" },
+  { glyph: "✦", left: "34%", top: "22%", x: "-10px", y: "-44px", delay: "70ms" },
+  { glyph: "✧", left: "52%", top: "68%", x: "6px", y: "-72px", delay: "120ms" },
+  { glyph: "♡", left: "70%", top: "26%", x: "18px", y: "-56px", delay: "180ms" },
+  { glyph: "❀", left: "82%", top: "60%", x: "30px", y: "-68px", delay: "230ms" },
+];
+const TOP_GIF_INTERACTION_CONFIG = ui.topGifInteraction ?? {};
+
 export default function Page() {
   const [noCount, setNoCount] = useState(0);
   const [yesPressed, setYesPressed] = useState(false);
@@ -207,12 +217,14 @@ export default function Page() {
   const [noBurstParticles, setNoBurstParticles] = useState([]);
   const [selectedPoster, setSelectedPoster] = useState(null);
   const [selectedPosterOrientation, setSelectedPosterOrientation] = useState("portrait");
+  const [topGifInteractions, setTopGifInteractions] = useState({ intro: null, success: null });
 
   const gifRef = useRef(null);
   const burstTimeoutsRef = useRef({ yes: null, no: null });
   const posterQueueRef = useRef([]);
   const shouldShowPosterInterludeRef = useRef(false);
   const posterPreloadStartedRef = useRef(false);
+  const topGifInteractionTimeoutsRef = useRef({ intro: null, success: null });
   const popupLanguageRef = useRef(isChineseCopyEnabled);
   const activePopupRef = useRef({ popup: null, titleCopy: null });
   popupLanguageRef.current = isChineseCopyEnabled;
@@ -336,9 +348,16 @@ export default function Page() {
 
   useEffect(() => {
     const burstTimeouts = burstTimeoutsRef.current;
+    const topGifInteractionTimeouts = topGifInteractionTimeoutsRef.current;
 
     return () => {
       Object.values(burstTimeouts).forEach((timerId) => {
+        if (timerId) {
+          clearTimeout(timerId);
+        }
+      });
+
+      Object.values(topGifInteractionTimeouts).forEach((timerId) => {
         if (timerId) {
           clearTimeout(timerId);
         }
@@ -543,6 +562,119 @@ export default function Page() {
     }
   };
 
+  const triggerTopGifInteraction = useCallback((target) => {
+    const effect = target === "success"
+      ? TOP_GIF_INTERACTION_CONFIG.successEffect ?? "heartbeat"
+      : TOP_GIF_INTERACTION_CONFIG.introEffect ?? "heartbeat";
+    const durationMs = effect === "snapshot"
+      ? TOP_GIF_INTERACTION_CONFIG.snapshotDurationMs ?? 2500
+      : TOP_GIF_INTERACTION_CONFIG.heartbeatDurationMs ?? 1100;
+
+    if (topGifInteractionTimeoutsRef.current[target]) {
+      clearTimeout(topGifInteractionTimeoutsRef.current[target]);
+    }
+
+    setTopGifInteractions((previous) => ({
+      ...previous,
+      [target]: {
+        effect,
+        key: `${target}-${effect}-${Date.now()}`,
+      },
+    }));
+
+    topGifInteractionTimeoutsRef.current[target] = setTimeout(() => {
+      setTopGifInteractions((previous) => ({
+        ...previous,
+        [target]: null,
+      }));
+    }, durationMs);
+  }, []);
+
+  const handleTopGifInteractionKeyDown = useCallback((target, event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      triggerTopGifInteraction(target);
+    }
+  }, [triggerTopGifInteraction]);
+
+  const getTopGifInteractionLabel = (target, effect) => {
+    if (effect === "snapshot") {
+      return getLocalizedCopy(TOP_GIF_INTERACTION_CONFIG.snapshotNotes?.[target], isChineseCopyEnabled);
+    }
+
+    return getLocalizedCopy(TOP_GIF_INTERACTION_CONFIG.heartbeatWhispers?.[target], isChineseCopyEnabled);
+  };
+
+  const getTopGifShellStyle = (target) => {
+    const effect = target === "success"
+      ? TOP_GIF_INTERACTION_CONFIG.successEffect ?? "heartbeat"
+      : TOP_GIF_INTERACTION_CONFIG.introEffect ?? "heartbeat";
+
+    if (effect === "snapshot") {
+      const snapshotDurationMs = TOP_GIF_INTERACTION_CONFIG.snapshotDurationMs ?? 2500;
+
+      return {
+        "--top-gif-snapshot-image-duration": `${Math.round(snapshotDurationMs * 0.88)}ms`,
+        "--top-gif-snapshot-frame-duration": `${snapshotDurationMs}ms`,
+        "--top-gif-snapshot-note-duration": `${snapshotDurationMs}ms`,
+      };
+    }
+
+    const heartbeatDurationMs = TOP_GIF_INTERACTION_CONFIG.heartbeatDurationMs ?? 1100;
+
+    return {
+      "--top-gif-heartbeat-duration": `${heartbeatDurationMs}ms`,
+      "--top-gif-halo-duration": `${Math.round(heartbeatDurationMs * 0.9)}ms`,
+      "--top-gif-whisper-duration": `${Math.round(heartbeatDurationMs * 1.02)}ms`,
+      "--top-gif-particle-duration": `${Math.round(heartbeatDurationMs * 0.82)}ms`,
+    };
+  };
+
+  const renderTopGifFeedback = (target, interaction) => {
+    if (!interaction) {
+      return null;
+    }
+
+    const label = getTopGifInteractionLabel(target, interaction.effect);
+
+    return (
+      <div
+        key={interaction.key}
+        className={`top-gif-feedback top-gif-feedback--${target} top-gif-feedback--${interaction.effect}`}
+        aria-hidden="true"
+      >
+        {interaction.effect === "snapshot" ? (
+          <>
+            <div className="top-gif-feedback__snapshot-card" />
+            <div className="top-gif-feedback__snapshot-note">{label}</div>
+          </>
+        ) : (
+          <>
+            <div className="top-gif-feedback__halo" />
+            <div className="top-gif-feedback__whisper">{label}</div>
+            <div className="top-gif-feedback__particles">
+              {TOP_GIF_HEARTBEAT_PARTICLES.map((particle, index) => (
+                <span
+                  key={`${interaction.key}-${particle.glyph}-${index}`}
+                  className="top-gif-feedback__particle"
+                  style={{
+                    "--top-gif-particle-left": particle.left,
+                    "--top-gif-particle-top": particle.top,
+                    "--top-gif-particle-x": particle.x,
+                    "--top-gif-particle-y": particle.y,
+                    "--top-gif-particle-delay": particle.delay,
+                  }}
+                >
+                  {particle.glyph}
+                </span>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
+
   const getNoButtonText = () => {
     return localizedNoPhrases[Math.min(noCount, localizedNoPhrases.length - 1)];
   };
@@ -703,7 +835,18 @@ export default function Page() {
           <div className="scene-stage relative z-20 flex items-center justify-center px-4 py-8 md:px-8">
             <div className="scene-panel success-shell success-shell--revealed w-full max-w-6xl">
               <div className="success-layout grid items-center md:grid-cols-[minmax(0,300px)_1fr] xl:grid-cols-[minmax(0,420px)_1fr]">
-                <div className="success-media-wrap relative flex justify-center">
+                <div
+                  className={`success-media-wrap top-gif-shell top-gif-shell--success relative flex justify-center ${topGifInteractions.success ? `top-gif-shell--${topGifInteractions.success.effect}` : ""}`}
+                  style={getTopGifShellStyle("success")}
+                  role="button"
+                  tabIndex={0}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    triggerTopGifInteraction("success");
+                  }}
+                  onKeyDown={(event) => handleTopGifInteractionKeyDown("success", event)}
+                  aria-label="Trigger success image interaction"
+                >
                   <div className="success-glow" />
                   <img
                     ref={gifRef}
@@ -711,6 +854,7 @@ export default function Page() {
                     src={media.yesGifs[currentGifIndex]}
                     alt="Yes Response"
                   />
+                  {renderTopGifFeedback("success", topGifInteractions.success)}
                 </div>
 
                 <div
@@ -747,7 +891,18 @@ export default function Page() {
           <div className="scene-stage relative z-20 flex items-center justify-center px-4 py-8 md:px-8">
             <div className="scene-panel hero-card hero-card--intro w-full max-w-5xl">
               <div className="hero-layout grid items-center md:grid-cols-[minmax(0,280px)_1fr] xl:grid-cols-[minmax(0,380px)_1fr]">
-                <div className="hero-media-wrap relative flex items-center justify-center">
+                <div
+                  className={`hero-media-wrap top-gif-shell top-gif-shell--intro relative flex items-center justify-center ${topGifInteractions.intro ? `top-gif-shell--${topGifInteractions.intro.effect}` : ""}`}
+                  style={getTopGifShellStyle("intro")}
+                  role="button"
+                  tabIndex={0}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    triggerTopGifInteraction("intro");
+                  }}
+                  onKeyDown={(event) => handleTopGifInteractionKeyDown("intro", event)}
+                  aria-label="Trigger hero image interaction"
+                >
                   <div className="hero-glow" />
                   <img
                     src={media.loveSvg}
@@ -760,6 +915,7 @@ export default function Page() {
                     src={media.initialGif}
                     alt="Love Animation"
                   />
+                  {renderTopGifFeedback("intro", topGifInteractions.intro)}
                 </div>
 
                 <div className="story-copy story-copy--intro text-center md:text-left" data-copy-locale={isChineseCopyEnabled ? "zh" : "en"}>

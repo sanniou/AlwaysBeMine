@@ -294,6 +294,20 @@ export const proposalConfig = {
     floatingGifMinDistance: 18,
     floatingGifMinDurationSec: 1.4,
     floatingGifRandomDurationRangeSec: 1.6,
+    topGifInteraction: {
+      introEffect: "heartbeat",
+      successEffect: "snapshot",
+      heartbeatDurationMs: 1100,
+      snapshotDurationMs: 2500,
+      heartbeatWhispers: {
+        intro: localized("You noticed me.", "被你发现啦"),
+        success: localized("Stay close.", "再靠近一点"),
+      },
+      snapshotNotes: {
+        intro: localized("keeping this flutter for us", "把这阵心动悄悄收好"),
+        success: localized("our softest little keepsake", "把这份温柔留作我们的小纪念"),
+      },
+    },
   },
   marquee: {
     intervalMs: 7600,
