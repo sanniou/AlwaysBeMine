@@ -16,7 +16,6 @@ const {
   thresholds,
   audio,
   media,
-  ui,
 } = proposalConfig;
 
 const YES_BUTTON_MORPH_STAGES = [
@@ -127,6 +126,59 @@ const getLocalizedCopy = (copy, isChineseCopyEnabled) => {
   return copy;
 };
 
+const YES_BUTTON_BURST_GLYPHS = ["♡", "✦", "✧", "❀"];
+const NO_BUTTON_BURST_GLYPHS = ["?", "·", "⋯", "~"];
+
+const createButtonBurst = (kind) => {
+  const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1024;
+  const isCompactViewport = viewportWidth < 640;
+  const isTabletViewport = viewportWidth >= 640 && viewportWidth < 1024;
+  const glyphs = kind === "yes" ? YES_BUTTON_BURST_GLYPHS : NO_BUTTON_BURST_GLYPHS;
+  const count = kind === "yes"
+    ? isCompactViewport
+      ? 4
+      : isTabletViewport
+        ? 5
+        : 6
+    : isCompactViewport
+      ? 3
+      : 4;
+  const minDistance = kind === "yes" ? 28 : 20;
+  const maxDistance = kind === "yes"
+    ? isCompactViewport
+      ? 56
+      : isTabletViewport
+        ? 72
+        : 88
+    : isCompactViewport
+      ? 38
+      : 52;
+
+  return Array.from({ length: count }, (_, index) => {
+    const angle = kind === "yes" ? -150 + Math.random() * 120 : -138 + Math.random() * 96;
+    const distance = minDistance + Math.random() * (maxDistance - minDistance);
+    const angleInRadians = (angle * Math.PI) / 180;
+    const translateX = Math.cos(angleInRadians) * distance;
+    const translateY = Math.sin(angleInRadians) * distance;
+    const fontSize = kind === "yes" ? 0.96 + Math.random() * 0.38 : 0.8 + Math.random() * 0.22;
+    const rotation = Math.random() * 52 - 26;
+    const duration = kind === "yes" ? 780 + Math.random() * 180 : 620 + Math.random() * 140;
+
+    return {
+      id: `${kind}-burst-${Date.now()}-${index}`,
+      glyph: glyphs[Math.floor(Math.random() * glyphs.length)],
+      style: {
+        "--particle-x": `${translateX.toFixed(1)}px`,
+        "--particle-y": `${translateY.toFixed(1)}px`,
+        "--particle-rotate": `${rotation.toFixed(1)}deg`,
+        "--particle-size": `${fontSize.toFixed(2)}rem`,
+        "--particle-delay": `${index * 34}ms`,
+        "--particle-duration": `${duration.toFixed(0)}ms`,
+      },
+    };
+  });
+};
+
 export default function Page() {
   const [noCount, setNoCount] = useState(0);
   const [yesPressed, setYesPressed] = useState(false);
@@ -140,8 +192,11 @@ export default function Page() {
   const [isChineseCopyEnabled, setIsChineseCopyEnabled] = useState(false);
   const [copyPulseVersion, setCopyPulseVersion] = useState(0);
   const [yesHeartbeatVersion, setYesHeartbeatVersion] = useState(0);
+  const [yesBurstParticles, setYesBurstParticles] = useState([]);
+  const [noBurstParticles, setNoBurstParticles] = useState([]);
 
   const gifRef = useRef(null);
+  const burstTimeoutsRef = useRef({ yes: null, no: null });
   const yesButtonMorph = getYesButtonMorph(noCount);
   const yesButtonStyle = {
     "--yes-inline-size": yesButtonMorph.inlineSize,
@@ -153,8 +208,6 @@ export default function Page() {
     "--yes-ring-size": yesButtonMorph.ringSize,
     "--yes-highlight-opacity": yesButtonMorph.highlightOpacity,
   };
-
-  const [floatingGifs, setFloatingGifs] = useState([]);
 
   const isSuccessUnlocked = noCount >= thresholds.successAfterNoCount || earlyYesSkipped;
   const isRevealed = yesPressed && isSuccessUnlocked;
@@ -178,58 +231,39 @@ export default function Page() {
   const localizedSuccessReady = getLocalizedCopy(labels.successReady, isChineseCopyEnabled);
   const localizedGatheringCourage = getLocalizedCopy(labels.gatheringCourage, isChineseCopyEnabled);
 
-  const generateRandomPositionWithSpacing = (existingPositions) => {
-    let position;
-    let tooClose;
+  const triggerButtonBurst = useCallback((kind) => {
+    const particles = createButtonBurst(kind);
 
-    do {
-      position = {
-        top: `${Math.random() * 90}vh`,
-        left: `${Math.random() * 90}vw`,
-      };
-
-      tooClose = existingPositions.some((p) => {
-        const dx = Math.abs(parseFloat(p.left) - parseFloat(position.left));
-        const dy = Math.abs(parseFloat(p.top) - parseFloat(position.top));
-        return Math.sqrt(dx * dx + dy * dy) < ui.floatingGifMinDistance;
-      });
-    } while (tooClose);
-
-    return position;
-  };
-
-  const createFloatingGifs = (src, prefix) => {
-    const gifs = [];
-    const positions = [];
-
-    for (let i = 0; i < ui.floatingGifCount; i++) {
-      const newPosition = generateRandomPositionWithSpacing(positions);
-      positions.push(newPosition);
-
-      gifs.push({
-        id: `${prefix}-${i}`,
-        src,
-        style: {
-          ...newPosition,
-          animationDuration: `${Math.random() * ui.floatingGifRandomDurationRangeSec + ui.floatingGifMinDurationSec}s`,
-        },
-      });
+    if (burstTimeoutsRef.current[kind]) {
+      clearTimeout(burstTimeoutsRef.current[kind]);
     }
 
-    setFloatingGifs(gifs);
-  };
+    if (kind === "yes") {
+      setYesBurstParticles(particles);
+    } else {
+      setNoBurstParticles(particles);
+    }
 
-  const handleMouseEnterYes = () => {
-    createFloatingGifs(media.hoverHeartGif, "heart");
-  };
+    burstTimeoutsRef.current[kind] = setTimeout(() => {
+      if (kind === "yes") {
+        setYesBurstParticles([]);
+      } else {
+        setNoBurstParticles([]);
+      }
+    }, 1100);
+  }, []);
 
-  const handleMouseEnterNo = () => {
-    createFloatingGifs(media.hoverSadGif, "sad");
-  };
+  useEffect(() => {
+    const burstTimeouts = burstTimeoutsRef.current;
 
-  const handleMouseLeave = () => {
-    setFloatingGifs([]);
-  };
+    return () => {
+      Object.values(burstTimeouts).forEach((timerId) => {
+        if (timerId) {
+          clearTimeout(timerId);
+        }
+      });
+    };
+  }, []);
 
   const playMusic = useCallback(
     (url, musicArray) => {
@@ -286,6 +320,8 @@ export default function Page() {
   }, [isSuccessUnlocked]);
 
   const handleNoClick = () => {
+    triggerButtonBurst("no");
+
     const nextCount = noCount + 1;
     setNoCount(nextCount);
     setYesHeartbeatVersion((previous) => previous + 1);
@@ -307,6 +343,8 @@ export default function Page() {
   };
 
   const handleYesClick = () => {
+    triggerButtonBurst("yes");
+
     if (!popupShown && !isSuccessUnlocked) {
       setYesPressed(true);
       return;
@@ -458,16 +496,6 @@ export default function Page() {
         <div className="scene-bloom scene-bloom--right" />
         <div className="scene-bloom scene-bloom--lower" />
 
-        {floatingGifs.map((gif) => (
-          <img
-            key={gif.id}
-            src={gif.src}
-            alt="Floating Animation"
-            className="absolute w-12 h-12 animate-bounce pointer-events-none z-10"
-            style={gif.style}
-          />
-        ))}
-
         {isRevealed ? (
           <div className="scene-stage relative z-20 flex items-center justify-center px-4 py-8 md:px-8">
             <div className="scene-panel success-shell success-shell--revealed w-full max-w-6xl">
@@ -558,22 +586,41 @@ export default function Page() {
                   <div className="proposal-actions hero-actions flex flex-wrap justify-center md:justify-start">
                     <button
                       key={`yes-heartbeat-${yesHeartbeatVersion}`}
-                      onMouseEnter={handleMouseEnterYes}
-                      onMouseLeave={handleMouseLeave}
+                      onMouseEnter={() => triggerButtonBurst("yes")}
                       className={`proposal-button proposal-button--yes rounded-full text-center ${yesButtonMorph.shouldHeartbeat ? "proposal-button--yes-heartbeat" : ""} ${yesButtonMorph.shouldBreathe ? "proposal-button--yes-breathing" : ""}`}
                       style={yesButtonStyle}
                       onClick={handleYesClick}
                     >
+                      <span className="proposal-button__burst" aria-hidden="true">
+                        {yesBurstParticles.map((particle) => (
+                          <span
+                            key={particle.id}
+                            className="proposal-button__particle proposal-button__particle--yes"
+                            style={particle.style}
+                          >
+                            {particle.glyph}
+                          </span>
+                        ))}
+                      </span>
                       <span aria-hidden="true" className="proposal-button__pulse-ring" />
                       <span className="proposal-button__label type-display font-bold">{localizedYesLabel}</span>
                     </button>
                     <button
-                      onMouseEnter={handleMouseEnterNo}
-                      onMouseLeave={handleMouseLeave}
                       onClick={handleNoClick}
                       className="proposal-button proposal-button--no rounded-full px-6 py-3"
                     >
-                      <span className="type-body font-bold tracking-wide">
+                      <span className="proposal-button__burst" aria-hidden="true">
+                        {noBurstParticles.map((particle) => (
+                          <span
+                            key={particle.id}
+                            className="proposal-button__particle proposal-button__particle--no"
+                            style={particle.style}
+                          >
+                            {particle.glyph}
+                          </span>
+                        ))}
+                      </span>
+                      <span className="proposal-button__label type-body font-bold tracking-wide">
                         {noCount === 0 ? localizedNoInitialLabel : getNoButtonText()}
                       </span>
                     </button>
